@@ -60,6 +60,11 @@ abstract_target 'RiotPods' do
   pod 'SwiftLint', '~> 0.43.0'
 
   target "Riot" do
+
+    pod 'Masonry'
+    pod 'QMUIKit'
+    pod 'YYText'
+
     import_MatrixKit
     pod 'DGCollectionViewLeftAlignFlowLayout', '~> 1.0.4'
     pod 'KTCenterFlowLayout', '~> 1.3.1'
