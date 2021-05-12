@@ -26,8 +26,16 @@
     return WRGBHex(0x333333);
 }
 
++ (UIColor *)text99Color {
+    return WRGBHex(0x999999);
+}
+
 + (UIColor *)textLightBlueColor {
     return WRGBHex(0x00D1FF);
+}
+
++ (UIColor *)fieldBorderColor {
+    return WRGBHex(0xDCDCDC);
 }
 
 

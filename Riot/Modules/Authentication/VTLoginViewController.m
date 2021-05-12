@@ -147,9 +147,71 @@
     signInLabel.font = [UIFont systemFontOfSize:16.0];
     [mainView addSubview:signInLabel];
     [signInLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-       make.centerY.mas_equalTo(signInWith.mas_centerY);
-       make.left.mas_equalTo(tipLabel.mas_left);
+        make.centerY.mas_equalTo(signInWith.mas_centerY);
+        make.left.mas_equalTo(tipLabel.mas_left);
     }];
+
+    QMUITextField *userNameField = [[QMUITextField alloc] init];
+    userNameField.placeholder = @"Username";
+    userNameField.qmui_borderLayer.cornerRadius = 3;
+    userNameField.qmui_borderLayer.masksToBounds = YES;
+    userNameField.qmui_borderWidth = 1;
+    userNameField.qmui_borderColor = [Common fieldBorderColor];
+    [mainView addSubview:userNameField];
+
+    [userNameField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(signInWith.mas_bottom).mas_offset(16);
+        make.left.mas_equalTo(signInLabel.mas_left);
+        make.right.mas_equalTo(signInWith.mas_right);
+        make.height.mas_equalTo(40);
+    }];
+
+    QMUITextField *passwordField = [[QMUITextField alloc] init];
+    passwordField.placeholder = @"Password";
+    passwordField.qmui_borderLayer.cornerRadius = 3;
+    passwordField.qmui_borderLayer.masksToBounds = YES;
+    passwordField.qmui_borderWidth = 1;
+    passwordField.qmui_borderColor = [Common fieldBorderColor];
+    [mainView addSubview:passwordField];
+
+    [passwordField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(userNameField.mas_left);
+        make.right.mas_equalTo(userNameField.mas_right);
+        make.height.mas_equalTo(userNameField.mas_height);
+        make.top.mas_equalTo(userNameField.mas_bottom).mas_offset(16);
+    }];
+
+    NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
+    NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:@"Not sure of your password ? Set a new one" attributes:newOneDict];
+    [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:@"Set a new one"] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+        WLog(@"Set a new one Clicked");
+    }];
+    YYLabel *newOnLabel = [[YYLabel alloc] init];
+    newOnLabel.attributedText = tipString;
+    newOnLabel.textAlignment = NSTextAlignmentLeft;
+    newOnLabel.numberOfLines = 0;
+    [mainView addSubview:newOnLabel];
+
+    [newOnLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(passwordField.mas_bottom).mas_offset(10);
+        make.left.mas_equalTo(passwordField.mas_left);
+    }];
+
+    //渐变颜色
+    CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+    gradientLayer.colors     = @[(__bridge id) WRGBHex(0x00FAC4).CGColor, (__bridge id) WRGBHex(0x00D1FF).CGColor];
+    gradientLayer.locations  = @[@0.1, @1.0];
+    gradientLayer.startPoint = CGPointMake(0, 0);
+    gradientLayer.endPoint   = CGPointMake(1.0, 0);
+    gradientLayer.frame      = CGRectMake(0, 0,  308, 40);
+    gradientLayer.cornerRadius = 3;
+
+    QMUIButton *signInButton = [[QMUIButton alloc] init];
+    [signInButton.layer addSublayer:gradientLayer];
+
+    [signInButton setTitleColor:[UIColor whiteColor] forState:<#(UIControlState)state#>];
+
+
 }
 
 @end
