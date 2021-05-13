@@ -22,6 +22,7 @@
 #import "Common.h"
 #import <QMUIKit/QMUIKit.h>
 #import <YYText/YYText.h>
+#import <Masonry/View+MASAdditions.h>
 
 
 @interface VTLoginViewController () <AuthFallBackViewControllerDelegate, KeyVerificationCoordinatorBridgePresenterDelegate, SetPinCoordinatorBridgePresenterDelegate, SocialLoginListViewDelegate, SSOAuthenticationPresenterDelegate
@@ -64,6 +65,8 @@
     self.defaultHomeServerUrl = RiotSettings.shared.homeserverUrlString;
 
     self.defaultIdentityServerUrl = RiotSettings.shared.identityServerUrlString;
+
+    [self setupUI];
 }
 
 - (void)finalizeInit {
@@ -209,8 +212,26 @@
     QMUIButton *signInButton = [[QMUIButton alloc] init];
     [signInButton.layer addSublayer:gradientLayer];
 
-    [signInButton setTitleColor:[UIColor whiteColor] forState:<#(UIControlState)state#>];
+    [signInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [signInButton addTarget:self action:@selector(signInButtonClicked) forControlEvents:UIControlEventTouchUpInside];
+    signInButton.titleLabel.text = @"Sign in";
 
+    UILabel *createAccountLabel = [[UILabel alloc] init];
+    createAccountLabel.text = @"Create account";
+    createAccountLabel.textColor = [Common textLightBlueColor];
+    [mainView addSubview:createAccountLabel];
+    [createAccountLabel mas_makeConstraints:^(MASConstraintMaker *make){
+        make.top.mas_equalTo(signInButton.mas_bottom).mas_offset(8);
+        make.centerX.mas_equalTo(signInButton.mas_centerX);
+    }];
+
+    [mainView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.bottom.mas_equalTo(createAccountLabel.mas_bottom).mas_offset(36);
+    }];
+
+}
+
+-(void) signInButtonClicked {
 
 }
 
