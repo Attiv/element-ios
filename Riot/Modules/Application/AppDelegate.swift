@@ -72,8 +72,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Call legacy AppDelegate
         self.legacyAppDelegate.window = window
-        self.legacyAppDelegate.application(application, didFinishLaunchingWithOptions: launchOptions)
-        
+//        self.legacyAppDelegate.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        let loginController: VTLoginViewController = VTLoginViewController()
+        self.window?.rootViewController = loginController
+        self.window?.makeKeyAndVisible()
         return true
     }
     

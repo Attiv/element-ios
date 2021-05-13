@@ -30,6 +30,7 @@
 #import "SecurityViewController.h"
 
 #import "Riot-Swift.h"
+#import "VTLoginViewController.h"
 
 @interface MasterTabBarController () <AuthenticationViewControllerDelegate>
 {
@@ -420,7 +421,8 @@
     NSLog(@"[MasterTabBarController] showAuthenticationScreen");
     
     // Check whether an authentication screen is not already shown or preparing
-    if (!self.authViewController && !isAuthViewControllerPreparing)
+//    if (!self.authViewController && !isAuthViewControllerPreparing)
+    if (!self.loginViewController && !isAuthViewControllerPreparing)
     {
         isAuthViewControllerPreparing = YES;
         _authenticationInProgress = YES;
@@ -437,10 +439,12 @@
 
 - (void)showAuthenticationScreenWithRegistrationParameters:(NSDictionary *)parameters
 {
-    if (self.authViewController)
+//    if (self.authViewController)
+    if (self.loginViewController)
     {
         NSLog(@"[MasterTabBarController] Universal link: Forward registration parameter to the existing AuthViewController");
-        self.authViewController.externalRegistrationParameters = parameters;
+//        self.authViewController.externalRegistrationParameters = parameters;
+        self.loginViewController.externalRegistrationParameters = parameters;
     }
     else
     {
@@ -467,7 +471,8 @@
     softLogoutCredentials = credentials;
 
     // Check whether an authentication screen is not already shown or preparing
-    if (!self.authViewController && !isAuthViewControllerPreparing)
+//    if (!self.authViewController && !isAuthViewControllerPreparing)
+    if (!self.loginViewController && !isAuthViewControllerPreparing)
     {
         isAuthViewControllerPreparing = YES;
         _authenticationInProgress = YES;
@@ -699,16 +704,21 @@
     {
         // Keep ref on the authentification view controller while it is displayed
         // ie until we get the notification about a new account
-        _authViewController = segue.destinationViewController;
+
+
+//        _authViewController = segue.destinationViewController;
+          _loginViewController = segue.destinationViewController;
         isAuthViewControllerPreparing = NO;
         
         // Listen to the end of the authentication flow
-        _authViewController.authVCDelegate = self;
-        
+//        _authViewController.authVCDelegate = self;
+        _loginViewController.authVCDelegate = self;
+
         authViewControllerObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kMXKAccountManagerDidAddAccountNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
             
-            _authViewController = nil;
-            
+//            _authViewController = nil;
+            _loginViewController = nil;
+
             [[NSNotificationCenter defaultCenter] removeObserver:authViewControllerObserver];
             authViewControllerObserver = nil;
         }];
@@ -716,8 +726,9 @@
         authViewRemovedAccountObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kMXKAccountManagerDidRemoveAccountNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
             
             // The user has cleared data for their soft logged out account
-            _authViewController = nil;
-            
+//            _authViewController = nil;
+            _loginViewController = nil;
+
             [[NSNotificationCenter defaultCenter] removeObserver:authViewRemovedAccountObserver];
             authViewRemovedAccountObserver = nil;
         }];
@@ -725,12 +736,14 @@
         // Forward parameters if any
         if (authViewControllerRegistrationParameters)
         {
-            _authViewController.externalRegistrationParameters = authViewControllerRegistrationParameters;
+//            _authViewController.externalRegistrationParameters = authViewControllerRegistrationParameters;
+            _loginViewController.externalRegistrationParameters = authViewControllerRegistrationParameters;
             authViewControllerRegistrationParameters = nil;
         }
         if (softLogoutCredentials)
         {
-            _authViewController.softLogoutCredentials = softLogoutCredentials;
+//            _authViewController.softLogoutCredentials = softLogoutCredentials;
+            _loginViewController.softLogoutCredentials = softLogoutCredentials;
             softLogoutCredentials = nil;
         }
     }

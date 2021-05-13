@@ -64,6 +64,7 @@ abstract_target 'RiotPods' do
     pod 'Masonry'
     pod 'QMUIKit'
     pod 'YYText'
+    pod 'FLEX', :configurations => ['Debug']
 
     import_MatrixKit
     pod 'DGCollectionViewLeftAlignFlowLayout', '~> 1.0.4'
