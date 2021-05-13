@@ -43,6 +43,7 @@ PODS:
   - GBDeviceInfo/Core (6.6.0)
   - GZIP (1.3.0)
   - HPGrowingTextView (1.1)
+  - IQKeyboardManagerSwift (6.5.6)
   - JitsiMeetSDK (3.2.0)
   - KeychainAccess (4.2.2)
   - KituraContracts (1.2.1):
@@ -436,6 +437,7 @@ DEPENDENCIES:
   - FlowCommoniOS (~> 1.10.0)
   - GBDeviceInfo (~> 6.6.0)
   - HPGrowingTextView
+  - IQKeyboardManagerSwift
   - KeychainAccess (~> 4.2.2)
   - KTCenterFlowLayout (~> 1.3.1)
   - Masonry
@@ -470,6 +472,7 @@ SPEC REPOS:
     - GBDeviceInfo
     - GZIP
     - HPGrowingTextView
+    - IQKeyboardManagerSwift
     - JitsiMeetSDK
     - KeychainAccess
     - KituraContracts
@@ -509,6 +512,7 @@ SPEC CHECKSUMS:
   GBDeviceInfo: ed0db16230d2fa280e1cbb39a5a7f60f6946aaec
   GZIP: 416858efbe66b41b206895ac6dfd5493200d95b3
   HPGrowingTextView: 88a716d97fb853bcb08a4a08e4727da17efc9b19
+  IQKeyboardManagerSwift: c7df9d2deb356c04522f5c4b7b6e4ce4d8ed94fe
   JitsiMeetSDK: 9ba504480e831b3bfc85c34555f70a0a84626fa2
   KeychainAccess: c0c4f7f38f6fc7bbe58f5702e25f7bd2f65abf51
   KituraContracts: e845e60dc8627ad0a76fa55ef20a45451d8f830b
@@ -534,6 +538,6 @@ SPEC CHECKSUMS:
   zxcvbn-ios: fef98b7c80f1512ff0eec47ac1fa399fc00f7e3c
   ZXingObjC: fdbb269f25dd2032da343e06f10224d62f537bdb
 
-PODFILE CHECKSUM: 09bd5dd6012b8fcd5db293630c83927041c67387
+PODFILE CHECKSUM: 448744b65207a8fb136e75b383932afbab461b14
 
 COCOAPODS: 1.10.1
