@@ -132,15 +132,21 @@
     tipLabel.numberOfLines = 0;
     tipLabel.preferredMaxLayoutWidth = kScreenW - 60 - 20 - 16 - 16;
     [mainView addSubview:tipLabel];
+    
+    [mainView.superview layoutIfNeeded];
 
     [tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(topLabel.mas_left);
         make.top.mas_equalTo(topLabel.mas_bottom).mas_offset(17);
     }];
+    
+    [tipLabel.superview layoutIfNeeded];
 
-    JRDropDown *signInWith = [[JRDropDown alloc] init];
+    JRDropDown *signInWith = [[JRDropDown alloc] initWithFrame:CGRectMake(mainView.centerX, tipLabel.y + tipLabel.h + 18, 160, 36)];
     signInWith.layer.cornerRadius = 3;
     signInWith.layer.masksToBounds = YES;
+    signInWith.isSearchEnable = false;
+    signInWith.selectedRowColor = [UIColor lightGrayColor];
     signInWith.layer.borderWidth = 1;
     signInWith.layer.borderColor = [Common fieldBorderColor].CGColor;
     signInWith.optionArray = @[@"Username", @"1", @"2"];
@@ -155,6 +161,9 @@
         make.width.mas_equalTo(160);
         make.height.mas_equalTo(36);
     }];
+    
+//    [signInWith.superview layoutIfNeeded];
+//    signInWith.rightView.x = signInWith.rightView.x - 20;
 
     UILabel *signInLabel = [[UILabel alloc] init];
     signInLabel.text = @"Sign in with";

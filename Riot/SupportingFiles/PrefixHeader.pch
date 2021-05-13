@@ -20,6 +20,9 @@
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
 #import "Masonry.h"
+#import "UIView+WLKCat.h"
+
+
 #define kScreenW [UIScreen mainScreen].bounds.size.width
 
 #define kScreenH [UIScreen mainScreen].bounds.size.height

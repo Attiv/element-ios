@@ -129,6 +129,9 @@ open class DropDown : UITextField{
     fileprivate var TableDidDisappearCompletion: () -> () = { }
 
     func setupUI () {
+        let leftPaddingView:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 20))
+        self.leftView = leftPaddingView
+        self.leftViewMode = .always
         let size = self.frame.height
         let rightView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size, height: size))
         self.rightView = rightView
@@ -257,8 +260,8 @@ open class DropDown : UITextField{
 
     @objc public func hideList() {
         TableWillDisappearCompletion()
-        UIView.animate(withDuration: 1.0,
-                       delay: 0.4,
+        UIView.animate(withDuration: 0.2,
+                       delay: 0.2,
                        usingSpringWithDamping: 0.9,
                        initialSpringVelocity: 0.1,
                        options: .curveEaseInOut,
