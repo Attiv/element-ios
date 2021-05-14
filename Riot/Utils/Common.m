@@ -38,5 +38,13 @@
     return WRGBHex(0xDCDCDC);
 }
 
++ (UIColor *)onlineColor {
+    return WRGBHex(0x52C22C);
+}
+
++ (UIColor *)lightGray {
+    return WRGBHex(0xF2F0F7);
+}
+
 
 @end

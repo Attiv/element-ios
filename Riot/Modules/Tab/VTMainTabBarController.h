@@ -15,11 +15,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "QMUICommonViewController.h"
+#import <QMUITabBarViewController.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VTBaseViewController : QMUICommonViewController
+@interface VTMainTabBarController : QMUITabBarViewController
 
 @end
 

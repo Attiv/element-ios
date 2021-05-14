@@ -21,7 +21,8 @@
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
 #import "Masonry.h"
 #import "UIView+WLKCat.h"
-
+#import <QMUIKit/QMUIKit.h>
+#import "Common.h"
 
 #define kScreenW [UIScreen mainScreen].bounds.size.width
 

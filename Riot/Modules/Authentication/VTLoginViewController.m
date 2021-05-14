@@ -20,6 +20,7 @@
 #import "Riot-Swift.h"
 #import "MXSession+Riot.h"
 #import "Common.h"
+#import "VTMainTabBarController.h"
 #import <QMUIKit/QMUIKit.h>
 #import <YYText/YYText.h>
 #import <Masonry/View+MASAdditions.h>
@@ -290,7 +291,9 @@
 }
 
 -(void) signInButtonClicked {
-
+    VTMainTabBarController *mainTabBarController = [[VTMainTabBarController alloc] init];
+    mainTabBarController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController: mainTabBarController animated:YES completion:nil];
 }
 
 @end

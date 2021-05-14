@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIColor *)textLightBlueColor;
 
 +(UIColor *)fieldBorderColor;
+
++(UIColor *)onlineColor;
+
++(UIColor *)lightGray;
+
 @end
 
 NS_ASSUME_NONNULL_END
