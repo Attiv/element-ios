@@ -13,7 +13,7 @@ open class DropDown : UITextField{
     var arrow : Arrow!
     var table : UITableView!
     var shadow : UIView!
-    public  var selectedIndex: Int?
+    @objc public var selectedIndex = -1
 
 
     //MARK: IBInspectable
@@ -81,7 +81,7 @@ open class DropDown : UITextField{
                 }
             }
             reSizeTable()
-            selectedIndex = nil
+            selectedIndex = -1
             self.table.reloadData()
         }
     }
@@ -413,7 +413,7 @@ extension DropDown: UITableViewDataSource {
 extension DropDown: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectedIndex = (indexPath as NSIndexPath).row
-        let selectedText = self.dataArray[self.selectedIndex!]
+        let selectedText = self.dataArray[self.selectedIndex]
         tableView.cellForRow(at: indexPath)?.alpha = 0
         UIView.animate(withDuration: 0.5,
                        animations: { () -> Void in

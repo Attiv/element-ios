@@ -151,8 +151,10 @@
     signInWith.layer.borderColor = [Common fieldBorderColor].CGColor;
     signInWith.optionArray = @[@"Username", @"1", @"2"];
     signInWith.optionIds = @[@1, @2, @3];
+    signInWith.selectedIndex = 0;
+    signInWith.text = signInWith.optionArray[0];
     [signInWith didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
-        WLog(@"%@", selectedText);
+        WLog(@"%zd", index);
     }];
     [mainView addSubview:signInWith];
     [signInWith mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -261,6 +263,28 @@
 
     [mainView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(createAccountLabel.mas_bottom).mas_offset(36);
+    }];
+    
+    JRDropDown *languageList = [[JRDropDown alloc] initWithFrame:CGRectMake(self.view.centerX, mainView.y + mainView.h + 20, 150, 18)];
+    languageList.textColor = [UIColor whiteColor];
+    languageList.font = [UIFont systemFontOfSize:14];
+    languageList.arrowColor = [UIColor whiteColor];
+    languageList.isSearchEnable = false;
+    languageList.selectedRowColor = [UIColor lightGrayColor];
+    languageList.optionArray = @[@"English(US)", @"Chinese(ZH)"];
+    languageList.optionIds = @[@1, @2];
+    languageList.selectedIndex = 0;
+    languageList.text = languageList.optionArray[0];
+    [languageList didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
+        WLog(@"%@", selectedText);
+    }];
+    
+    [scrollView addSubview:languageList];
+    [languageList mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(mainView.mas_bottom).mas_offset(20);
+        make.centerX.mas_equalTo(self.view.mas_centerX);
+        make.width.mas_equalTo(150);
+        make.height.mas_equalTo(18);
     }];
 
 }
