@@ -14,11 +14,15 @@
 // limitations under the License.
 //
 
+
 #import "VTHomeViewController.h"
 #import "PrefixHeader.pch"
+#import "VTHomeCell.h"
 
-@interface VTHomeViewController ()
+const static NSString * kHomeCellIdentifier = @"home_cll";
 
+@interface VTHomeViewController ()<UITableViewDataSource, UITableViewDelegate>
+@property (nonatomic, strong) QMUITableView *tableView;
 @end
 
 @implementation VTHomeViewController
@@ -112,6 +116,26 @@
     [topView mas_updateConstraints:^(MASConstraintMaker *make) {
        make.bottom.mas_equalTo(searchBar.mas_bottom).mas_offset(16);
     }];
+
+    UIView *pubicView = [[UIView alloc] init];
+    pubicView.backgroundColor = [Common lightGray];
+    [self.view addSubview:pubicView];
+    [pubicView mas_makeConstraints:^(MASConstraintMaker *make) {
+       make.top.mas_equalTo(topView.mas_bottom);
+       make.height.mas_equalTo(53);
+       make.left.mas_equalTo(self.view.mas_left);
+       make.right.mas_equalTo(self.view.mas_right);
+    }];
+
+    [self.view addSubview:self.tableView];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+       make.top.mas_equalTo(pubicView.mas_bottom);
+       make.left.mas_equalTo(self.view.mas_left);
+       make.right.mas_equalTo(self.view.mas_right);
+       make.bottom.mas_equalTo(self.view.mas_bottom);
+    }];
 }
 
 -(UIView *)statusView {
@@ -121,6 +145,45 @@
     sView.layer.borderColor = WRGBHex(0xEFF2F5).CGColor;
     return sView;
 }
+
+#pragma mark - lazyload
+
+- (QMUITableView *)tableView {
+    if (nil == _tableView) {
+        _tableView = [[QMUITableView alloc] initWithFrame:CGRectMake(0, 0, kScreenW, kScreenH) style:UITableViewStylePlain];
+        [_tableView registerClass:[VTHomeCell class] forCellReuseIdentifier:kHomeCellIdentifier];
+    }
+    return _tableView;
+}
+
+#pragma mark - tableView delegate
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 5;
+}
+
+- (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.w, 54)];
+    QMUILabel *titleLabel = [[QMUILabel alloc] initWithFrame:CGRectMake(60, 19, 100, 18)];
+    titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightBold];
+    titleLabel.text = @"GROUP";
+    titleLabel.textColor = WRGBHex(0x46494D);
+    return headerView;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    VTHomeCell *cell = [tableView dequeueReusableCellWithIdentifier:kHomeCellIdentifier forIndexPath:indexPath];
+    if (nil == cell) {
+        cell = [[VTHomeCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kHomeCellIdentifier];
+    }
+    return cell;
+}
+
+
 
 /*
 #pragma mark - Navigation
