@@ -39,6 +39,7 @@ internal enum InfoPlist {
   internal static let uiLaunchStoryboardName: String = _document["UILaunchStoryboardName"]
   internal static let uiRequiredDeviceCapabilities: [String] = _document["UIRequiredDeviceCapabilities"]
   internal static let uiStatusBarHidden: Bool = _document["UIStatusBarHidden"]
+  internal static let uiStatusBarStyle: String = _document["UIStatusBarStyle"]
   internal static let uiStatusBarTintParameters: [String: Any] = _document["UIStatusBarTintParameters"]
   internal static let uiSupportedInterfaceOrientations: [String] = _document["UISupportedInterfaceOrientations"]
   internal static let uiSupportedInterfaceOrientationsIpad: [String] = _document["UISupportedInterfaceOrientations~ipad"]

@@ -48,16 +48,17 @@
     [topView addSubview:avatarImageView];
 
     [avatarImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(topView.mas_top).mas_offset(16);
+        make.top.mas_equalTo(topView.mas_top).mas_offset(16 + StatusBarHeight);
         make.left.mas_equalTo(topView.mas_left).mas_offset(16);
         make.width.mas_equalTo(44);
         make.height.mas_equalTo(44);
     }];
 
     UIView *myStatusView = [self statusView];
-    [avatarImageView addSubview:myStatusView];
+    myStatusView.backgroundColor = [Common onlineColor];
+    [topView addSubview:myStatusView];
     [myStatusView mas_makeConstraints:^(MASConstraintMaker *make) {
-       make.centerY.mas_equalTo(avatarImageView.mas_bottom).mas_offset(-3);
+       make.centerY.mas_equalTo(avatarImageView.mas_bottom).mas_offset(-8);
        make.right.mas_equalTo(avatarImageView.mas_right);
        make.width.mas_equalTo(12);
        make.height.mas_equalTo(12);
@@ -79,7 +80,7 @@
     accountLabel.text = @"nodefy.me";
     [topView addSubview:accountLabel];
     [accountLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.bottom.mas_equalTo(avatarImageView.mas_centerY).mas_offset(1);
+        make.top.mas_equalTo(avatarImageView.mas_centerY).mas_offset(1);
         make.left.mas_equalTo(nameLabel.mas_left);
     }];
 
