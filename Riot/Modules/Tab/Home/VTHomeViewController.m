@@ -126,6 +126,16 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
        make.left.mas_equalTo(self.view.mas_left);
        make.right.mas_equalTo(self.view.mas_right);
     }];
+    
+    QMUILabel *publicLabel = [[QMUILabel alloc] init];
+    publicLabel.font = [UIFont systemFontOfSize:18];
+    publicLabel.textColor = WRGBHex(0x46494D);
+    publicLabel.text = @"Public";
+    [pubicView addSubview:publicLabel];
+    [publicLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.mas_equalTo(pubicView.mas_centerY);
+        make.left.mas_equalTo(pubicView.mas_left).mas_offset(47);
+    }];
 
     [self.view addSubview:self.tableView];
     self.tableView.delegate = self;
@@ -152,6 +162,9 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
     if (nil == _tableView) {
         _tableView = [[QMUITableView alloc] initWithFrame:CGRectMake(0, 0, kScreenW, kScreenH) style:UITableViewStylePlain];
         [_tableView registerClass:[VTHomeCell class] forCellReuseIdentifier:kHomeCellIdentifier];
+        _tableView.backgroundColor = [Common lightGray];
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     }
     return _tableView;
 }
@@ -173,6 +186,11 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
     titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightBold];
     titleLabel.text = @"GROUP";
     titleLabel.textColor = WRGBHex(0x46494D);
+    [headerView addSubview:titleLabel];
+    [titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(headerView.mas_left).mas_offset(76);
+        make.centerY.mas_equalTo(headerView.mas_centerY);
+    }];
     return headerView;
 }
 
@@ -181,9 +199,24 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
     if (nil == cell) {
         cell = [[VTHomeCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kHomeCellIdentifier];
     }
-    cell.statusView.backgroundColor = [Common onlineColor];
+    [cell.statusView setBackgroundColor:[Common onlineColor]];
+    
     cell.nameLabel.text = @"Lyle";
+    cell.backgroundColor = [Common lightGray];
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 30+8+8;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat sectionHeaderHeight = 50;
+    if(scrollView.contentOffset.y<=sectionHeaderHeight&&scrollView.contentOffset.y>=0) {
+        scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0,0);
+    } else if (scrollView.contentOffset.y>=sectionHeaderHeight) {
+        scrollView.contentInset = UIEdgeInsetsMake(-sectionHeaderHeight, 0, 0, 0);
+    }
 }
 
 

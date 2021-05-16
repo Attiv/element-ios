@@ -46,6 +46,7 @@
     }];
 
     UIView *statusView = [self statusView];
+    statusView.backgroundColor = [Common onlineColor];
     self.statusView = statusView;
     [self addSubview:statusView];
 
