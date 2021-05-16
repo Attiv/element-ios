@@ -15,11 +15,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PrefixHeader.pch"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VTHomeCell : UITableViewCell
-
+@property (nonatomic, strong)UIImageView *avatarImageView;
+@property (nonatomic, strong)UIView *statusView;
+@property (nonatomic, strong)QMUILabel *nameLabel;
 @end
 
 NS_ASSUME_NONNULL_END

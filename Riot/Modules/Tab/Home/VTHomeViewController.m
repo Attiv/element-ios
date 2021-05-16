@@ -158,6 +158,7 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
 
 #pragma mark - tableView delegate
 
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
@@ -180,6 +181,8 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
     if (nil == cell) {
         cell = [[VTHomeCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kHomeCellIdentifier];
     }
+    cell.statusView.backgroundColor = [Common onlineColor];
+    cell.nameLabel.text = @"Lyle";
     return cell;
 }
 

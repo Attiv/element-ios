@@ -35,8 +35,46 @@
     UIImageView *avatarImageView = [[UIImageView alloc] initWithFrame:CGRectMake(13, 8, 30, 30)];
     avatarImageView.image = [UIImage imageNamed:@"tab_people"];
     avatarImageView.layer.cornerRadius = 15;
+    avatarImageView.layer.masksToBounds = YES;
+    self.avatarImageView = avatarImageView;
+    [self addSubview:avatarImageView];
+    [avatarImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.mas_left).mas_offset(13);
+        make.width.mas_equalTo(30);
+        make.height.mas_equalTo(30);
+        make.centerY.mas_equalTo(self.mas_centerY);
+    }];
+
+    UIView *statusView = [self statusView];
+    self.statusView = statusView;
+    [self addSubview:statusView];
+
+    [statusView mas_makeConstraints:^(MASConstraintMaker *make) {
+       make.width.mas_equalTo(10);
+       make.height.mas_equalTo(10);
+       make.left.mas_equalTo(avatarImageView.mas_right).mas_offset(-5);
+       make.bottom.mas_equalTo(avatarImageView.mas_bottom).mas_offset(-2);
+    }];
+
+    QMUILabel *nameLabel = [[QMUILabel alloc] init];
+    self.nameLabel = nameLabel;
+    nameLabel.font = [UIFont systemFontOfSize:16];
+    nameLabel.textColor = WRGBHex(0x373B40);
+    [self addSubview:nameLabel];
+    [nameLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+       make.left.mas_equalTo(avatarImageView.mas_right).mas_equalTo(10);
+       make.centerY.mas_equalTo(self.mas_centerY);
+    }];
 
 
+}
+
+-(UIView *)statusView {
+    UIView *sView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+    sView.layer.cornerRadius = 3;
+    sView.layer.borderWidth = 1;
+    sView.layer.borderColor = WRGBHex(0xEFF2F5).CGColor;
+    return sView;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
