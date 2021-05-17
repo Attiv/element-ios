@@ -534,6 +534,10 @@ internal enum VectorL10n {
   internal static var cancel: String { 
     return VectorL10n.tr("Vector", "cancel") 
   }
+  /// Change
+  internal static var change: String { 
+    return VectorL10n.tr("Vector", "change") 
+  }
   /// Close
   internal static var close: String { 
     return VectorL10n.tr("Vector", "close") 
@@ -581,6 +585,10 @@ internal enum VectorL10n {
   /// Create
   internal static var create: String { 
     return VectorL10n.tr("Vector", "create") 
+  }
+  /// Create account
+  internal static var createAccount: String { 
+    return VectorL10n.tr("Vector", "Create account") 
   }
   /// Enable Encryption
   internal static var createRoomEnableEncryption: String { 
@@ -1185,6 +1193,10 @@ internal enum VectorL10n {
   /// Encryption key request
   internal static var e2eRoomKeyRequestTitle: String { 
     return VectorL10n.tr("Vector", "e2e_room_key_request_title") 
+  }
+  /// Email addresses
+  internal static var emailAddresses: String { 
+    return VectorL10n.tr("Vector", "email_addresses") 
   }
   /// Activities
   internal static var emojiPickerActivityCategory: String { 
@@ -2158,6 +2170,10 @@ internal enum VectorL10n {
   internal static var noVoipTitle: String { 
     return VectorL10n.tr("Vector", "no_voip_title") 
   }
+  /// Not sure of your password ?
+  internal static var notSureOfYourPassword: String { 
+    return VectorL10n.tr("Vector", "Not sure of your password ?") 
+  }
   /// Off
   internal static var off: String { 
     return VectorL10n.tr("Vector", "off") 
@@ -2169,6 +2185,10 @@ internal enum VectorL10n {
   /// or
   internal static var or: String { 
     return VectorL10n.tr("Vector", "or") 
+  }
+  /// Password
+  internal static var password: String { 
+    return VectorL10n.tr("Vector", "Password") 
   }
   /// CONVERSATIONS
   internal static var peopleConversationSection: String { 
@@ -2189,6 +2209,10 @@ internal enum VectorL10n {
   /// No conversations
   internal static var peopleNoConversation: String { 
     return VectorL10n.tr("Vector", "people_no_conversation") 
+  }
+  /// Phone
+  internal static var phone: String { 
+    return VectorL10n.tr("Vector", "Phone") 
   }
   /// %@ doesn't have permission to access photo library, please change privacy settings
   internal static func photoLibraryAccessNotGranted(_ p1: String) -> String {
@@ -3922,6 +3946,10 @@ internal enum VectorL10n {
   internal static var serviceTermsModalTitleIdentityServer: String { 
     return VectorL10n.tr("Vector", "service_terms_modal_title_identity_server") 
   }
+  /// Set a new one
+  internal static var setANewOne: String { 
+    return VectorL10n.tr("Vector", "Set a new one") 
+  }
   /// Invalid credentials
   internal static var settingsAdd3pidInvalidPasswordMessage: String { 
     return VectorL10n.tr("Vector", "settings_add_3pid_invalid_password_message") 
@@ -4485,6 +4513,14 @@ internal enum VectorL10n {
   /// Failed to send. Check in the main app the encryption settings for this room
   internal static var shareExtensionFailedToEncrypt: String { 
     return VectorL10n.tr("Vector", "share_extension_failed_to_encrypt") 
+  }
+  /// Sign in with
+  internal static var signInWith: String { 
+    return VectorL10n.tr("Vector", "Sign in with") 
+  }
+  /// Sign in to your Matrix account on matrix-client.matrix.org
+  internal static var signInToYourMatrixAccountOnMatrixClientMatrixOrg: String { 
+    return VectorL10n.tr("Vector", "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org") 
   }
   /// Sign out
   internal static var signOutExistingKeyBackupAlertSignOutAction: String { 

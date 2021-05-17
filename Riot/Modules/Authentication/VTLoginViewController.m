@@ -149,7 +149,7 @@
     signInWith.selectedRowColor = [UIColor lightGrayColor];
     signInWith.layer.borderWidth = 1;
     signInWith.layer.borderColor = [Common fieldBorderColor].CGColor;
-    signInWith.optionArray = @[kString(@"username"), kString(@"email_address"), kString(@"phone")];
+    signInWith.optionArray = @[kString(@"auth_user_name_placeholder"), kString(@"email_address"), kString(@"phone")];
     signInWith.optionIds = @[@1, @2, @3];
     signInWith.selectedIndex = 0;
     signInWith.text = signInWith.optionArray[0];
@@ -210,8 +210,8 @@
     }];
 
     NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
-    NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:@"Not sure of your password ? Set a new one" attributes:newOneDict];
-    [tipString yy_setTextHighlightRange:[[newOneString string] rangeOfString:@"Set a new one"] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+    NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@? %@", kString(@"not_sure_of_your_password"), kString(@"set_a_new_one")] attributes:newOneDict];
+    [newOneString yy_setTextHighlightRange:[[newOneString string] rangeOfString:kString(@"set_a_new_one")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
         WLog(@"Set a new one Clicked");
     }];
     YYLabel *newOnLabel = [[YYLabel alloc] init];
@@ -252,7 +252,7 @@
     }];
 
     UILabel *createAccountLabel = [[UILabel alloc] init];
-    createAccountLabel.text = @"Create account";
+    createAccountLabel.text = kString(@"create_account");
     createAccountLabel.font = [UIFont systemFontOfSize:12];
     createAccountLabel.textColor = [Common textLightBlueColor];
     [mainView addSubview:createAccountLabel];
@@ -271,7 +271,7 @@
     languageList.arrowColor = [UIColor whiteColor];
     languageList.isSearchEnable = false;
     languageList.selectedRowColor = [UIColor lightGrayColor];
-    languageList.optionArray = @[@"English(US)", @"Chinese(ZH)"];
+    languageList.optionArray = @[@"English(US)", @"中文"];
     languageList.optionIds = @[@1, @2];
     languageList.selectedIndex = 0;
     languageList.text = languageList.optionArray[0];
