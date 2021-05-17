@@ -272,11 +272,12 @@
     languageList.isSearchEnable = false;
     languageList.selectedRowColor = [UIColor lightGrayColor];
     languageList.optionArray = @[@"English(US)", @"中文"];
-    languageList.optionIds = @[@1, @2];
+    languageList.optionIds = @[@0, @1];
     languageList.selectedIndex = 0;
     languageList.text = languageList.optionArray[0];
+    __block NSArray *languages = @[English_US, Chinese_Simple];
     [languageList didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
-        WLog(@"%@", selectedText);
+        [Common setNewLanguage:languages[id]];
     }];
     
     [scrollView addSubview:languageList];

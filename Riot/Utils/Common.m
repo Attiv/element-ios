@@ -47,4 +47,40 @@
 }
 
 
+/// 设置多语言
+/// @param language 语言
++ (void)setNewLanguage:(NSString *)language
+{
+    NSString * setLanguage = [[NSUserDefaults standardUserDefaults] objectForKey:Language_Key];
+    if ([language isEqualToString:setLanguage]) {
+        return;
+    }
+    // 简体中文
+    else if ([language isEqualToString:Chinese_Simple]) {
+        [[NSUserDefaults standardUserDefaults] setObject:Chinese_Simple forKey:Language_Key];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    // 英文
+    else if ([language isEqualToString:English_US]) {
+        [[NSUserDefaults standardUserDefaults] setObject:English_US forKey:Language_Key];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    [NSBundle setLanguage:language];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kChangeLanguageNotify object:nil];
+
+}
+
++ (void)systemLanguage{
+    NSString *languageCode = [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"][0];
+    WLog(@"系统语言:%@",languageCode);
+    if([languageCode hasPrefix:@"zh-Hans"]){
+        languageCode = @"zh-Hans";//简体中文
+    }else if([languageCode hasPrefix:@"en"]){
+        languageCode = @"en";//英语
+    }
+    [self setNewLanguage:languageCode];
+}
+
+
 @end

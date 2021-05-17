@@ -23,6 +23,7 @@
 #import "UIView+WLKCat.h"
 #import <QMUIKit/QMUIKit.h>
 #import "Common.h"
+#import "NSBundle+language.h"
 
 #define kScreenW [UIScreen mainScreen].bounds.size.width
 
@@ -37,6 +38,11 @@
 #define WRGBHexAlpha(rgbValue, a) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:(a)]
 
 #define kString(string) NSLocalizedStringFromTable(string, @"Vector", nil)
+
+#define Chinese_Simple @"zh-Hans"
+#define English_US @"en"
+#define Language_Key @"LanguageKey"
+#define kChangeLanguageNotify @"change_Language_notify"
 
 #ifdef DEBUG   //调试阶段
 

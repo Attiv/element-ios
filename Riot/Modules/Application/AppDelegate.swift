@@ -62,6 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
         
+        NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NSNotification.Name(rawValue: "change_Language_notify"), object: nil)
+        
         // Create AppCoordinator
         self.rootRouter = RootRouter(window: window)
         
@@ -79,6 +81,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.rootViewController = loginController
         self.window?.makeKeyAndVisible()
         return true
+    }
+    
+    @objc func changeLanguage() {
+        let rootVC: UIViewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
+        let loginController: VTLoginViewController = VTLoginViewController()
+        UIApplication.shared.delegate?.window??.rootViewController = loginController
+        UIApplication.shared.delegate?.window??.makeKeyAndVisible()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

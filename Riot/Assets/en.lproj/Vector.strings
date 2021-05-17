@@ -1636,10 +1636,10 @@ Tap the + to start adding people.";
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "Sign in to your Matrix account on matrix-client.matrix.org";
 "change" = "Change";
 "email_addresses" = "Email addresses";
-"Phone" = "Phone";
-"Create account" = "Create account";
-"Sign in with" = "Sign in with";
-"Password" = "Password";
-"Not sure of your password ?" = "Not sure of your password ?";
-"Set a new one" = "Set a new one";
+"phone" = "Phone";
+"create_account" = "Create account";
+"sign_in_with" = "Sign in with";
+"password" = "Password";
+"not_sure_of_your_password" = "Not sure of your password";
+"set_a_new_one" = "Set a new one";
 

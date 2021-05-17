@@ -588,7 +588,7 @@ internal enum VectorL10n {
   }
   /// Create account
   internal static var createAccount: String { 
-    return VectorL10n.tr("Vector", "Create account") 
+    return VectorL10n.tr("Vector", "create_account") 
   }
   /// Enable Encryption
   internal static var createRoomEnableEncryption: String { 
@@ -2170,9 +2170,9 @@ internal enum VectorL10n {
   internal static var noVoipTitle: String { 
     return VectorL10n.tr("Vector", "no_voip_title") 
   }
-  /// Not sure of your password ?
+  /// Not sure of your password
   internal static var notSureOfYourPassword: String { 
-    return VectorL10n.tr("Vector", "Not sure of your password ?") 
+    return VectorL10n.tr("Vector", "not_sure_of_your_password") 
   }
   /// Off
   internal static var off: String { 
@@ -2188,7 +2188,7 @@ internal enum VectorL10n {
   }
   /// Password
   internal static var password: String { 
-    return VectorL10n.tr("Vector", "Password") 
+    return VectorL10n.tr("Vector", "password") 
   }
   /// CONVERSATIONS
   internal static var peopleConversationSection: String { 
@@ -2212,7 +2212,7 @@ internal enum VectorL10n {
   }
   /// Phone
   internal static var phone: String { 
-    return VectorL10n.tr("Vector", "Phone") 
+    return VectorL10n.tr("Vector", "phone") 
   }
   /// %@ doesn't have permission to access photo library, please change privacy settings
   internal static func photoLibraryAccessNotGranted(_ p1: String) -> String {
@@ -3948,7 +3948,7 @@ internal enum VectorL10n {
   }
   /// Set a new one
   internal static var setANewOne: String { 
-    return VectorL10n.tr("Vector", "Set a new one") 
+    return VectorL10n.tr("Vector", "set_a_new_one") 
   }
   /// Invalid credentials
   internal static var settingsAdd3pidInvalidPasswordMessage: String { 
@@ -4514,13 +4514,13 @@ internal enum VectorL10n {
   internal static var shareExtensionFailedToEncrypt: String { 
     return VectorL10n.tr("Vector", "share_extension_failed_to_encrypt") 
   }
-  /// Sign in with
-  internal static var signInWith: String { 
-    return VectorL10n.tr("Vector", "Sign in with") 
-  }
   /// Sign in to your Matrix account on matrix-client.matrix.org
   internal static var signInToYourMatrixAccountOnMatrixClientMatrixOrg: String { 
     return VectorL10n.tr("Vector", "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org") 
+  }
+  /// Sign in with
+  internal static var signInWith: String { 
+    return VectorL10n.tr("Vector", "sign_in_with") 
   }
   /// Sign out
   internal static var signOutExistingKeyBackupAlertSignOutAction: String { 

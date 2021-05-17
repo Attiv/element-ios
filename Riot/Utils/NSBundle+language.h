@@ -15,29 +15,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import "PrefixHeader.pch"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Common : NSObject
-+ (UIColor *)text66Color;
-
-+ (UIColor *)text33Color;
-
-+ (UIColor *)text99Color;
-
-+ (UIColor *)textLightBlueColor;
-
-+(UIColor *)fieldBorderColor;
-
-+(UIColor *)onlineColor;
-
-+(UIColor *)lightGray;
-
-+ (void)setNewLanguage:(NSString *)language;
-
-
+@interface NSBundle (language)
+// 设置语言
++ (void)setLanguage:(NSString *)language;
 @end
 
 NS_ASSUME_NONNULL_END
