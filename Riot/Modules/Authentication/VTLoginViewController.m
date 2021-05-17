@@ -74,7 +74,7 @@
     [super finalizeInit];
     self.enableBarTintColorStatusChange = NO;
     self.rageShakeManager = [RageShakeManager sharedManager];
-    defaultCountryCode = @"GB";
+    defaultCountryCode = @"EN";
     didCheckFalseAuthScreenDisplay = NO;
 }
 
@@ -114,17 +114,16 @@
 
     UILabel *topLabel = [[UILabel alloc] init];
     topLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightSemibold];
-    topLabel.text = @"Sign in";
+    topLabel.text = NSLocalizedStringFromTable(@"auth_softlogout_sign_in", @"Vector", nil);
     topLabel.textColor = [Common text33Color];
     [mainView addSubview:topLabel];
     [topLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(mainView.mas_top).mas_offset(20);
         make.left.mas_equalTo(mainView.mas_left).mas_offset(20);
     }];
-
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
-    NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:@"Sign in to your Matrix account on matrix-client.matrix.org Change" attributes:attributes];
-    [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:@"Change"] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+    NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", kString(@"sign_in_to_your_Matrix_account_on_matrix_client_matrix_org"), kString(@"change")] attributes:attributes];
+    [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
         WLog(@"Change Clicked");
     }];
     YYLabel *tipLabel = [[YYLabel alloc] init];
@@ -150,7 +149,7 @@
     signInWith.selectedRowColor = [UIColor lightGrayColor];
     signInWith.layer.borderWidth = 1;
     signInWith.layer.borderColor = [Common fieldBorderColor].CGColor;
-    signInWith.optionArray = @[@"Username", @"1", @"2"];
+    signInWith.optionArray = @[kString(@"username"), kString(@"email_address"), kString(@"phone")];
     signInWith.optionIds = @[@1, @2, @3];
     signInWith.selectedIndex = 0;
     signInWith.text = signInWith.optionArray[0];
@@ -169,7 +168,7 @@
 //    signInWith.rightView.x = signInWith.rightView.x - 20;
 
     UILabel *signInLabel = [[UILabel alloc] init];
-    signInLabel.text = @"Sign in with";
+    signInLabel.text = kString(@"sign_in_with");
     signInLabel.textColor = [Common text66Color];
     signInLabel.font = [UIFont systemFontOfSize:16.0];
     [mainView addSubview:signInLabel];
@@ -180,7 +179,7 @@
 
     QMUITextField *userNameField = [[QMUITextField alloc] init];
     userNameField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
-    userNameField.placeholder = @"Username";
+    userNameField.placeholder = kString(@"auth_user_name_placeholder");
     userNameField.layer.cornerRadius = 3;
     userNameField.layer.masksToBounds = YES;
     userNameField.layer.borderWidth = 1;
@@ -196,7 +195,7 @@
 
     QMUITextField *passwordField = [[QMUITextField alloc] init];
     passwordField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
-    passwordField.placeholder = @"Password";
+    passwordField.placeholder = kString(@"password");
     passwordField.layer.cornerRadius = 3;
     passwordField.layer.masksToBounds = YES;
     passwordField.layer.borderWidth = 1;
@@ -241,7 +240,7 @@
     [signInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [signInButton addTarget:self action:@selector(signInButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     
-    [signInButton setTitle:@"Sign in" forState:UIControlStateNormal];
+    [signInButton setTitle:NSLocalizedStringFromTable(@"auth_softlogout_sign_in", @"Vector", nil) forState:UIControlStateNormal];
     signInButton.titleLabel.font = [UIFont systemFontOfSize:14.0];
     
     [mainView addSubview:signInButton];
