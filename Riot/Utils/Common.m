@@ -46,6 +46,19 @@
     return WRGBHex(0xF2F0F7);
 }
 
++(void)initLanguage{
+    NSString *language=[self currentLanguage];
+    if (language.length>0) {
+        WLog(@"自设置语言:%@",language);
+    }else{
+        [self systemLanguage];
+    }
+}
+
++(NSString *)currentLanguage{
+    NSString *language=[[NSUserDefaults standardUserDefaults]objectForKey:Language_Key];
+    return language;
+}
 
 /// 设置多语言
 /// @param language 语言

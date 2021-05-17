@@ -58,11 +58,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         IQKeyboardManager.shared.enable = true
+        
+        Common.initLanguage()
         // Setup window
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
         
-        NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NSNotification.Name(rawValue: "change_Language_notify"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NSNotification.Name(rawValue: kChangeLanguageNotify), object: nil)
         
         // Create AppCoordinator
         self.rootRouter = RootRouter(window: window)
