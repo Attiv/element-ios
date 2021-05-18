@@ -485,9 +485,7 @@
     [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(self.loginView.mas_bottom).mas_offset(20);
     }];
-//    self.registerView.hidden = YES;
-//    self.loginView.hidden = NO;
-    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromRight animations:^{
+    [UIView transitionWithView:self.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromRight animations:^{
         self.registerView.hidden = YES;
         self.loginView.hidden = NO;
     } completion:nil];
@@ -499,9 +497,9 @@
         [self setupRegisterView];
     }
     [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
+        make.top.mas_equalTo(self.loginView.mas_bottom).mas_offset(60);
     }];
-    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
+    [UIView transitionWithView:self.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
         self.registerView.hidden = NO;
         self.loginView.hidden = YES;
     } completion:nil];
