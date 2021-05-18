@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 +(void)initLanguage;
 
++(NSString *)currentLanguage;
+
 @end
 
 NS_ASSUME_NONNULL_END

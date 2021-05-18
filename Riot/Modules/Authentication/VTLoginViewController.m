@@ -273,10 +273,11 @@
     languageList.selectedRowColor = [UIColor lightGrayColor];
     languageList.optionArray = @[@"English(US)", @"中文"];
     languageList.optionIds = @[@0, @1];
-    // todo 设置默认选中当前语言
-    languageList.selectedIndex = 0;
-    languageList.text = languageList.optionArray[0];
     __block NSArray *languages = @[English_US, Chinese_Simple];
+    NSString *currentLanguage = [Common currentLanguage];
+    NSInteger idx = [languages indexOfObject:currentLanguage];
+    languageList.selectedIndex = idx;
+    languageList.text = languageList.optionArray[idx];
     [languageList didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
         [Common setNewLanguage:languages[id]];
     }];
