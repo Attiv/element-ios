@@ -39,7 +39,7 @@
 
 #define kString(string) NSLocalizedStringFromTable(string, @"Vector", nil)
 
-#define Chinese_Simple @"zh-Hans"
+#define Chinese_Simple @"zh_Hans"
 #define English_US @"en"
 #define Language_Key @"LanguageKey"
 #define kChangeLanguageNotify @"change_Language_notify"

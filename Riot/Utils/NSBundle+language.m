@@ -16,7 +16,7 @@
 
 #import "NSBundle+language.h"
 #import <objc/runtime.h>
-
+#import "Common.h"
 static const char _bundle = 0;
 
 @interface BundleEx : NSBundle
@@ -28,7 +28,12 @@ static const char _bundle = 0;
 
 - (NSString *)localizedStringForKey:(NSString *)key value:(NSString *)value table:(NSString *)tableName {
     NSBundle *bundle = objc_getAssociatedObject(self, &_bundle);
-    return bundle ? [bundle localizedStringForKey:key value:value table:tableName] : [super localizedStringForKey:key value:value table:tableName];
+    NSString *language = [Common currentLanguage];
+    if (nil == bundle) {
+        bundle = [[NSBundle mainBundle] pathForResource:language ofType:@"lproj"];
+    }
+    return [bundle localizedStringForKey:key value:value table:tableName];
+//    return bundle ? [bundle localizedStringForKey:key value:value table:tableName] : [super localizedStringForKey:key value:value table:tableName];
 }
 
 @end

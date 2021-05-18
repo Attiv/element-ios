@@ -87,10 +87,10 @@
 + (void)systemLanguage{
     NSString *languageCode = [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"][0];
     WLog(@"系统语言:%@",languageCode);
-    if([languageCode hasPrefix:@"zh-Hans"]){
-        languageCode = @"zh-Hans";//简体中文
+    if([languageCode hasPrefix:@"zh-Han"]){
+        languageCode = Chinese_Simple;//简体中文
     }else if([languageCode hasPrefix:@"en"]){
-        languageCode = @"en";//英语
+        languageCode = English_US;//英语
     }
     [self setNewLanguage:languageCode];
 }
