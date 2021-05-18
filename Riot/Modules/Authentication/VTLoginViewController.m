@@ -66,6 +66,7 @@
 @property (nonatomic, strong) UIView *loginView;
 @property (nonatomic, strong) UIView *registerView;
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) JRDropDown *languageDropDown;
 
 @end
 
@@ -179,9 +180,6 @@
         make.width.mas_equalTo(160);
         make.height.mas_equalTo(36);
     }];
-    
-//    [signInWith.superview layoutIfNeeded];
-//    signInWith.rightView.x = signInWith.rightView.x - 20;
 
     UILabel *signInLabel = [[UILabel alloc] init];
     signInLabel.text = kString(@"sign_in_with");
@@ -230,12 +228,7 @@
     NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
     NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@? %@", kString(@"not_sure_of_your_password"), kString(@"set_a_new_one")] attributes:newOneDict];
     [newOneString yy_setTextHighlightRange:[[newOneString string] rangeOfString:kString(@"set_a_new_one")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        if (nil == self.registerView) {
-            [self setupRegisterView];
-        } else {
-            self.registerView.hidden = NO;
-            self.loginView.hidden = YES;
-        }
+        [self switchRegister];
     }];
     YYLabel *newOnLabel = [[YYLabel alloc] init];
     newOnLabel.attributedText = newOneString;
@@ -283,6 +276,9 @@
         make.top.mas_equalTo(signInButton.mas_bottom).mas_offset(8);
         make.centerX.mas_equalTo(signInButton.mas_centerX);
     }];
+    UITapGestureRecognizer *createAccountLabelTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(switchRegister)];
+    [createAccountLabel addGestureRecognizer:createAccountLabelTap];
+    createAccountLabel.userInteractionEnabled = YES;
 
     [mainView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(createAccountLabel.mas_bottom).mas_offset(36);
@@ -303,10 +299,11 @@
     NSInteger idx = [languages indexOfObject:currentLanguage];
     languageList.selectedIndex = idx;
     languageList.text = languageList.optionArray[idx];
+    languageList.textAlignment = NSTextAlignmentCenter;
     [languageList didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
         [Common setNewLanguage:languages[id]];
     }];
-    
+    self.languageDropDown = languageList;
     [scrollView addSubview:languageList];
     [languageList mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(mainView.mas_bottom).mas_offset(20);
@@ -438,8 +435,7 @@
     NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
     NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@? %@", kString(@"already_have_account"), kString(@"sign_in_here")] attributes:newOneDict];
     [newOneString yy_setTextHighlightRange:[[newOneString string] rangeOfString:kString(@"sign_in_here")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        self.registerView.hidden = YES;
-        self.loginView.hidden = NO;
+        [self switchLogin];
     }];
     YYLabel *newOnLabel = [[YYLabel alloc] init];
     newOnLabel.attributedText = newOneString;
@@ -482,7 +478,31 @@
         make.bottom.mas_equalTo(registerButton.mas_bottom).mas_offset(36);
     }];
 
+    [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
+    }];
 
+
+}
+
+- (void) switchLogin {
+    self.registerView.hidden = YES;
+    self.loginView.hidden = NO;
+    [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.loginView.mas_bottom).mas_offset(20);
+    }];
+}
+
+-(void) switchRegister {
+    if (nil == self.registerView) {
+        [self setupRegisterView];
+    } else {
+        self.registerView.hidden = NO;
+        self.loginView.hidden = YES;
+        [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
+        }];
+    }
 }
 
 -(void) registerButtonClicked {
