@@ -57,16 +57,16 @@
     BOOL didCheckFalseAuthScreenDisplay;
 }
 
-@property (nonatomic, strong) NSString *userNameStr;
-@property (nonatomic, strong) QMUITextField *userNameInput;
-@property (nonatomic, strong) QMUITextField *registerUserNameInput;
-@property (nonatomic, strong) QMUITextField *registerEmailInput;
-@property (nonatomic, strong) QMUITextField *registerConfirmPasswordInput;
-@property (nonatomic, strong) QMUITextField *registerPasswordInput;
-@property (nonatomic, strong) UIView *loginView;
-@property (nonatomic, strong) UIView *registerView;
-@property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) JRDropDown *languageDropDown;
+@property(nonatomic, strong) NSString *userNameStr;
+@property(nonatomic, strong) QMUITextField *userNameInput;
+@property(nonatomic, strong) QMUITextField *registerUserNameInput;
+@property(nonatomic, strong) QMUITextField *registerEmailInput;
+@property(nonatomic, strong) QMUITextField *registerConfirmPasswordInput;
+@property(nonatomic, strong) QMUITextField *registerPasswordInput;
+@property(nonatomic, strong) UIView *loginView;
+@property(nonatomic, strong) UIView *registerView;
+@property(nonatomic, strong) UIScrollView *scrollView;
+@property(nonatomic, strong) JRDropDown *languageDropDown;
 
 @end
 
@@ -109,8 +109,8 @@
     }];
 
     UIView *mainView = [[UIView alloc] init];
-    
-     
+
+
     [scrollView addSubview:mainView];
     [mainView setBackgroundColor:[UIColor whiteColor]];
     mainView.layer.cornerRadius = 5;
@@ -144,14 +144,14 @@
     tipLabel.numberOfLines = 0;
     tipLabel.preferredMaxLayoutWidth = kScreenW - 60 - 20 - 16 - 16;
     [mainView addSubview:tipLabel];
-    
+
     [mainView.superview layoutIfNeeded];
 
     [tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(topLabel.mas_left);
         make.top.mas_equalTo(topLabel.mas_bottom).mas_offset(17);
     }];
-    
+
     [tipLabel.superview layoutIfNeeded];
 
     JRDropDown *signInWith = [[JRDropDown alloc] initWithFrame:CGRectMake(mainView.centerX, tipLabel.y + tipLabel.h + 18, 160, 36)];
@@ -243,11 +243,11 @@
 
     //渐变颜色
     CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-    gradientLayer.colors     = @[(__bridge id) WRGBHex(0x00D1FF).CGColor, (__bridge id) WRGBHex(0x00FAC4).CGColor];
-    gradientLayer.locations  = @[@0.1, @1.0];
+    gradientLayer.colors = @[(__bridge id) WRGBHex(0x00D1FF).CGColor, (__bridge id) WRGBHex(0x00FAC4).CGColor];
+    gradientLayer.locations = @[@0.1, @1.0];
     gradientLayer.startPoint = CGPointMake(0, 0);
-    gradientLayer.endPoint   = CGPointMake(1.0, 0);
-    gradientLayer.frame      = CGRectMake(0, 0,  308, 40);
+    gradientLayer.endPoint = CGPointMake(1.0, 0);
+    gradientLayer.frame = CGRectMake(0, 0, 308, 40);
     gradientLayer.cornerRadius = 3;
 
     QMUIButton *signInButton = [[QMUIButton alloc] init];
@@ -255,10 +255,10 @@
 
     [signInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [signInButton addTarget:self action:@selector(signInButtonClicked) forControlEvents:UIControlEventTouchUpInside];
-    
+
     [signInButton setTitle:NSLocalizedStringFromTable(@"auth_softlogout_sign_in", @"Vector", nil) forState:UIControlStateNormal];
     signInButton.titleLabel.font = [UIFont systemFontOfSize:14.0];
-    
+
     [mainView addSubview:signInButton];
     [signInButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(newOnLabel.mas_bottom).mas_offset(16);
@@ -272,7 +272,7 @@
     createAccountLabel.font = [UIFont systemFontOfSize:12];
     createAccountLabel.textColor = [Common textLightBlueColor];
     [mainView addSubview:createAccountLabel];
-    [createAccountLabel mas_makeConstraints:^(MASConstraintMaker *make){
+    [createAccountLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(signInButton.mas_bottom).mas_offset(8);
         make.centerX.mas_equalTo(signInButton.mas_centerX);
     }];
@@ -314,14 +314,15 @@
 
 }
 
--(void) setupRegisterView {
+- (void)setupRegisterView {
     UIView *registerView = [[UIView alloc] init];
+    registerView.hidden = YES;
     [registerView setBackgroundColor:[UIColor whiteColor]];
     registerView.layer.cornerRadius = 5;
     registerView.layer.masksToBounds = YES;
     registerView.layer.borderWidth = 1;
     registerView.layer.borderColor = [Common fieldBorderColor].CGColor;
-    [self.view addSubview: registerView];
+    [self.view addSubview:registerView];
     self.registerView = registerView;
     [registerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(self.loginView.mas_top);
@@ -450,11 +451,11 @@
 
     //渐变颜色
     CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-    gradientLayer.colors     = @[(__bridge id) WRGBHex(0x00D1FF).CGColor, (__bridge id) WRGBHex(0x00FAC4).CGColor];
-    gradientLayer.locations  = @[@0.1, @1.0];
+    gradientLayer.colors = @[(__bridge id) WRGBHex(0x00D1FF).CGColor, (__bridge id) WRGBHex(0x00FAC4).CGColor];
+    gradientLayer.locations = @[@0.1, @1.0];
     gradientLayer.startPoint = CGPointMake(0, 0);
-    gradientLayer.endPoint   = CGPointMake(1.0, 0);
-    gradientLayer.frame      = CGRectMake(0, 0,  308, 40);
+    gradientLayer.endPoint = CGPointMake(1.0, 0);
+    gradientLayer.frame = CGRectMake(0, 0, 308, 40);
     gradientLayer.cornerRadius = 3;
 
     QMUIButton *registerButton = [[QMUIButton alloc] init];
@@ -478,42 +479,45 @@
         make.bottom.mas_equalTo(registerButton.mas_bottom).mas_offset(36);
     }];
 
-    [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
-    }];
-
-
 }
 
-- (void) switchLogin {
-    self.registerView.hidden = YES;
-    self.loginView.hidden = NO;
+- (void)switchLogin {
     [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(self.loginView.mas_bottom).mas_offset(20);
     }];
+//    self.registerView.hidden = YES;
+//    self.loginView.hidden = NO;
+    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
+        self.registerView.hidden = YES;
+        self.loginView.hidden = NO;
+    } completion:nil];
+
 }
 
--(void) switchRegister {
+- (void)switchRegister {
     if (nil == self.registerView) {
         [self setupRegisterView];
-    } else {
+    }
+    [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
+    }];
+    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
         self.registerView.hidden = NO;
         self.loginView.hidden = YES;
-        [self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
-            make.top.mas_equalTo(self.registerView.mas_bottom).mas_offset(20);
-        }];
-    }
-}
-
--(void) registerButtonClicked {
+    } completion:nil];
 
 
 }
 
--(void) signInButtonClicked {
+- (void)registerButtonClicked {
+
+
+}
+
+- (void)signInButtonClicked {
     VTMainTabBarController *mainTabBarController = [[VTMainTabBarController alloc] init];
     mainTabBarController.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController: mainTabBarController animated:YES completion:nil];
+    [self presentViewController:mainTabBarController animated:YES completion:nil];
 }
 
 @end
