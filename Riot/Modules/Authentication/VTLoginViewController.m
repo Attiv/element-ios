@@ -59,6 +59,13 @@
 
 @property (nonatomic, strong) NSString *userNameStr;
 @property (nonatomic, strong) QMUITextField *userNameInput;
+@property (nonatomic, strong) QMUITextField *registerUserNameInput;
+@property (nonatomic, strong) QMUITextField *registerEmailInput;
+@property (nonatomic, strong) QMUITextField *registerConfirmPasswordInput;
+@property (nonatomic, strong) QMUITextField *registerPasswordInput;
+@property (nonatomic, strong) UIView *loginView;
+@property (nonatomic, strong) UIView *registerView;
+@property (nonatomic, strong) UIScrollView *scrollView;
 
 @end
 
@@ -87,6 +94,7 @@
     self.view.backgroundColor = WRGBHex(0x190C37);
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
     [self.view addSubview:scrollView];
+    self.scrollView = scrollView;
     [scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.mas_equalTo(self.view);
     }];
@@ -117,7 +125,7 @@
 
     UILabel *topLabel = [[UILabel alloc] init];
     topLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightSemibold];
-    topLabel.text = NSLocalizedStringFromTable(@"auth_softlogout_sign_in", @"Vector", nil);
+    topLabel.text = kString(@"auth_softlogout_sign_in");
     topLabel.textColor = [Common text33Color];
     [mainView addSubview:topLabel];
     [topLabel mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -207,6 +215,7 @@
     passwordField.placeholder = kString(@"password");
     passwordField.layer.cornerRadius = 3;
     passwordField.layer.masksToBounds = YES;
+    passwordField.secureTextEntry = YES;
     passwordField.layer.borderWidth = 1;
     passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
     [mainView addSubview:passwordField];
@@ -221,7 +230,12 @@
     NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
     NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@? %@", kString(@"not_sure_of_your_password"), kString(@"set_a_new_one")] attributes:newOneDict];
     [newOneString yy_setTextHighlightRange:[[newOneString string] rangeOfString:kString(@"set_a_new_one")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        WLog(@"Set a new one Clicked");
+        if (nil == self.registerView) {
+            [self setupRegisterView];
+        } else {
+            self.registerView.hidden = NO;
+            self.loginView.hidden = YES;
+        }
     }];
     YYLabel *newOnLabel = [[YYLabel alloc] init];
     newOnLabel.attributedText = newOneString;
@@ -273,7 +287,9 @@
     [mainView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.bottom.mas_equalTo(createAccountLabel.mas_bottom).mas_offset(36);
     }];
-    
+
+    self.loginView = mainView;
+
     JRDropDown *languageList = [[JRDropDown alloc] initWithFrame:CGRectMake(self.view.centerX, mainView.y + mainView.h + 20, 150, 18)];
     languageList.textColor = [UIColor whiteColor];
     languageList.font = [UIFont systemFontOfSize:14];
@@ -298,6 +314,179 @@
         make.width.mas_equalTo(150);
         make.height.mas_equalTo(18);
     }];
+
+}
+
+-(void) setupRegisterView {
+    UIView *registerView = [[UIView alloc] init];
+    [registerView setBackgroundColor:[UIColor whiteColor]];
+    registerView.layer.cornerRadius = 5;
+    registerView.layer.masksToBounds = YES;
+    registerView.layer.borderWidth = 1;
+    registerView.layer.borderColor = [Common fieldBorderColor].CGColor;
+    [self.view addSubview: registerView];
+    self.registerView = registerView;
+    [registerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.loginView.mas_top);
+        make.left.mas_equalTo(self.loginView.mas_left);
+        make.right.mas_equalTo(self.loginView.mas_right);
+    }];
+
+    UILabel *topLabel = [[UILabel alloc] init];
+    topLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightSemibold];
+    topLabel.text = kString(@"set_a_new_one");
+    topLabel.textColor = [Common text33Color];
+    [registerView addSubview:topLabel];
+
+    [topLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(registerView.mas_top).mas_offset(20);
+        make.left.mas_equalTo(registerView.mas_left).mas_offset(20);
+    }];
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
+    NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", kString(@"create_account_on_matrix_client_matrix_org"), kString(@"change")] attributes:attributes];
+    [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+        WLog(@"Change Clicked");
+    }];
+    YYLabel *tipLabel = [[YYLabel alloc] init];
+    tipLabel.attributedText = tipString;
+    tipLabel.textAlignment = NSTextAlignmentLeft;
+    tipLabel.numberOfLines = 0;
+    tipLabel.preferredMaxLayoutWidth = kScreenW - 60 - 20 - 16 - 16;
+    [registerView addSubview:tipLabel];
+
+    [registerView.superview layoutIfNeeded];
+
+    [tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(topLabel.mas_left);
+        make.top.mas_equalTo(topLabel.mas_bottom).mas_offset(17);
+    }];
+
+    [tipLabel.superview layoutIfNeeded];
+
+
+    QMUITextField *userNameField = [[QMUITextField alloc] init];
+    userNameField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
+    userNameField.placeholder = kString(@"auth_user_name_placeholder");
+    userNameField.layer.cornerRadius = 3;
+    userNameField.layer.masksToBounds = YES;
+    userNameField.layer.borderWidth = 1;
+    userNameField.layer.borderColor = [Common fieldBorderColor].CGColor;
+    [registerView addSubview:userNameField];
+    self.registerUserNameInput = userNameField;
+
+    [userNameField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(tipLabel.mas_bottom).mas_offset(16);
+        make.left.mas_equalTo(registerView.mas_left).mas_offset(20);
+        make.right.mas_equalTo(registerView.mas_right).mas_offset(-20);
+        make.height.mas_equalTo(40);
+    }];
+
+    QMUITextField *passwordField = [[QMUITextField alloc] init];
+    passwordField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
+    passwordField.placeholder = kString(@"password");
+    passwordField.layer.cornerRadius = 3;
+    passwordField.layer.masksToBounds = YES;
+    passwordField.layer.borderWidth = 1;
+    passwordField.secureTextEntry = YES;
+    passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
+    self.registerPasswordInput = passwordField;
+    [registerView addSubview:passwordField];
+
+    [passwordField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(userNameField.mas_left);
+        make.right.mas_equalTo(userNameField.mas_right);
+        make.height.mas_equalTo(userNameField.mas_height);
+        make.top.mas_equalTo(userNameField.mas_bottom).mas_offset(16);
+    }];
+
+    QMUITextField *confirmPasswordField = [[QMUITextField alloc] init];
+    confirmPasswordField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
+    confirmPasswordField.placeholder = kString(@"confirm_password");
+    confirmPasswordField.layer.cornerRadius = 3;
+    confirmPasswordField.layer.masksToBounds = YES;
+    confirmPasswordField.layer.borderWidth = 1;
+    confirmPasswordField.secureTextEntry = YES;
+    confirmPasswordField.layer.borderColor = [Common fieldBorderColor].CGColor;
+    self.registerConfirmPasswordInput = confirmPasswordField;
+    [registerView addSubview:confirmPasswordField];
+
+    [confirmPasswordField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(userNameField.mas_left);
+        make.right.mas_equalTo(userNameField.mas_right);
+        make.height.mas_equalTo(userNameField.mas_height);
+        make.top.mas_equalTo(passwordField.mas_bottom).mas_offset(16);
+    }];
+
+    QMUITextField *emailField = [[QMUITextField alloc] init];
+    emailField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
+    emailField.placeholder = kString(@"email_addresses");
+    emailField.layer.cornerRadius = 3;
+    emailField.layer.masksToBounds = YES;
+    emailField.layer.borderWidth = 1;
+    emailField.layer.borderColor = [Common fieldBorderColor].CGColor;
+    self.registerEmailInput = emailField;
+    [registerView addSubview:emailField];
+
+    [emailField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(userNameField.mas_left);
+        make.right.mas_equalTo(userNameField.mas_right);
+        make.height.mas_equalTo(userNameField.mas_height);
+        make.top.mas_equalTo(confirmPasswordField.mas_bottom).mas_offset(16);
+    }];
+
+
+    NSDictionary *newOneDict = @{NSFontAttributeName: [UIFont systemFontOfSize:12], NSForegroundColorAttributeName: [Common text99Color]};
+    NSMutableAttributedString *newOneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@? %@", kString(@"already_have_account"), kString(@"sign_in_here")] attributes:newOneDict];
+    [newOneString yy_setTextHighlightRange:[[newOneString string] rangeOfString:kString(@"sign_in_here")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+        self.registerView.hidden = YES;
+        self.loginView.hidden = NO;
+    }];
+    YYLabel *newOnLabel = [[YYLabel alloc] init];
+    newOnLabel.attributedText = newOneString;
+    newOnLabel.textAlignment = NSTextAlignmentLeft;
+    newOnLabel.numberOfLines = 0;
+    [registerView addSubview:newOnLabel];
+
+    [newOnLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(emailField.mas_bottom).mas_offset(10);
+        make.left.mas_equalTo(confirmPasswordField.mas_left);
+    }];
+
+    //渐变颜色
+    CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+    gradientLayer.colors     = @[(__bridge id) WRGBHex(0x00D1FF).CGColor, (__bridge id) WRGBHex(0x00FAC4).CGColor];
+    gradientLayer.locations  = @[@0.1, @1.0];
+    gradientLayer.startPoint = CGPointMake(0, 0);
+    gradientLayer.endPoint   = CGPointMake(1.0, 0);
+    gradientLayer.frame      = CGRectMake(0, 0,  308, 40);
+    gradientLayer.cornerRadius = 3;
+
+    QMUIButton *registerButton = [[QMUIButton alloc] init];
+    [registerButton.layer addSublayer:gradientLayer];
+
+    [registerButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [registerButton addTarget:self action:@selector(registerButtonClicked) forControlEvents:UIControlEventTouchUpInside];
+
+    [registerButton setTitle:kString(@"register") forState:UIControlStateNormal];
+    registerButton.titleLabel.font = [UIFont systemFontOfSize:14.0];
+
+    [registerView addSubview:registerButton];
+    [registerButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(newOnLabel.mas_bottom).mas_offset(16);
+        make.left.mas_equalTo(passwordField.mas_left);
+        make.right.mas_equalTo(passwordField.mas_right);
+        make.height.mas_equalTo(40);
+    }];
+
+    [registerView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.bottom.mas_equalTo(registerButton.mas_bottom).mas_offset(36);
+    }];
+
+
+}
+
+-(void) registerButtonClicked {
+
 
 }
 

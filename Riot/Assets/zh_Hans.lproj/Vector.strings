@@ -1249,10 +1249,15 @@
 
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "在Matrix-client.Matrix.org上登录您的Matrix帐户";
 "change" = "更改";
-"email_address" = "邮箱地址";
+"email_addresses" = "邮箱地址";
 "phone" = "电话号码";
 "create_account" = "创建账号";
 "sign_in_with" = "登录方式";
 "password" = "密码";
 "not_sure_of_your_password" = "忘记密码";
 "set_a_new_one" = "创建账号";
+"create_account_on_matrix_client_matrix_org" = "在Matrix-client.Matrix.org上创建帐户";
+"confirm_password" = "确认密码";
+"sign_in_here" = "点击登录";
+"already_have_account" = "已经拥有账号";
+"register" = "注册";

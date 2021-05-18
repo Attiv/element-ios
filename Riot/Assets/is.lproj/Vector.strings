@@ -482,12 +482,20 @@
 "e2e_room_key_request_message" = "Ósannvottaða tækið þitt '%@' er að krefjast dulritunarlykla.";
 
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org";
-"change" = "change";
-"username" = "username";
-"email_address" = "email_address";
+"change" = "Change";
+"username" = "Username";
+"email_address" = "Email Address";
 "phone" = "phone";
 "sign_in_with" = "sign_in_with";
 "password" = "password";
 "set_a_new_one" = "set_a_new_one";
 "not_sure_of_your_password" = "not_sure_of_your_password";
 "create_account" = "create_account";
+"auth_softlogout_sign_in" = "auth_softlogout_sign_in";
+"create_account_on_matrix_client_matrix_org" = "create_account_on_matrix_client_matrix_org";
+"confirm_password" = "confirm_password";
+"already_have_account" = "aleady_have_account";
+"sign_in_here" = "sign_in_here";
+"register" = "Register";
+
+"email_addresses" = "email_addresses";

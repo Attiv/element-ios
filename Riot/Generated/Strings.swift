@@ -30,6 +30,10 @@ internal enum VectorL10n {
   internal static func activeCallDetails(_ p1: String) -> String {
     return VectorL10n.tr("Vector", "active_call_details", p1)
   }
+  /// Already have an account
+  internal static var alreadyHaveAccount: String { 
+    return VectorL10n.tr("Vector", "already_have_account") 
+  }
   /// Please review and accept the policies of this homeserver:
   internal static var authAcceptPolicies: String { 
     return VectorL10n.tr("Vector", "auth_accept_policies") 
@@ -546,6 +550,10 @@ internal enum VectorL10n {
   internal static var collapse: String { 
     return VectorL10n.tr("Vector", "collapse") 
   }
+  /// Confirm password
+  internal static var confirmPassword: String { 
+    return VectorL10n.tr("Vector", "confirm_password") 
+  }
   /// Matrix users only
   internal static var contactsAddressBookMatrixUsersToggle: String { 
     return VectorL10n.tr("Vector", "contacts_address_book_matrix_users_toggle") 
@@ -589,6 +597,10 @@ internal enum VectorL10n {
   /// Create account
   internal static var createAccount: String { 
     return VectorL10n.tr("Vector", "create_account") 
+  }
+  /// Create account on matrix-client.matrix.org
+  internal static var createAccountOnMatrixClientMatrixOrg: String { 
+    return VectorL10n.tr("Vector", "create_account_on_matrix_client_matrix_org") 
   }
   /// Enable Encryption
   internal static var createRoomEnableEncryption: String { 
@@ -2329,6 +2341,10 @@ internal enum VectorL10n {
   /// Read: 
   internal static var receiptStatusRead: String { 
     return VectorL10n.tr("Vector", "receipt_status_read") 
+  }
+  /// Register
+  internal static var register: String { 
+    return VectorL10n.tr("Vector", "register") 
   }
   /// Remove
   internal static var remove: String { 
@@ -4513,6 +4529,10 @@ internal enum VectorL10n {
   /// Failed to send. Check in the main app the encryption settings for this room
   internal static var shareExtensionFailedToEncrypt: String { 
     return VectorL10n.tr("Vector", "share_extension_failed_to_encrypt") 
+  }
+  /// Sign in here
+  internal static var signInHere: String { 
+    return VectorL10n.tr("Vector", "sign_in_here") 
   }
   /// Sign in to your Matrix account on matrix-client.matrix.org
   internal static var signInToYourMatrixAccountOnMatrixClientMatrixOrg: String { 

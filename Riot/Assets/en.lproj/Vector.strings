@@ -1642,4 +1642,9 @@ Tap the + to start adding people.";
 "password" = "Password";
 "not_sure_of_your_password" = "Not sure of your password";
 "set_a_new_one" = "Set a new one";
+"create_account_on_matrix_client_matrix_org" = "Create account on matrix-client.matrix.org";
+"confirm_password" = "Confirm password";
+"sign_in_here" = "Sign in here";
+"already_have_account" = "Already have an account";
+"register" = "Register";
 
