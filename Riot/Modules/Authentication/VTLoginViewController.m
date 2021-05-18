@@ -57,6 +57,9 @@
     BOOL didCheckFalseAuthScreenDisplay;
 }
 
+@property (nonatomic, strong) NSString *userNameStr;
+@property (nonatomic, strong) QMUITextField *userNameInput;
+
 @end
 
 @implementation VTLoginViewController
@@ -153,8 +156,13 @@
     signInWith.optionIds = @[@1, @2, @3];
     signInWith.selectedIndex = 0;
     signInWith.text = signInWith.optionArray[0];
+    self.userNameStr = kString(@"auth_user_name_placeholder");
     [signInWith didSelectWithCompletion:^(NSString *selectedText, NSInteger index, NSInteger id) {
         WLog(@"%zd", index);
+        self.userNameStr = signInWith.optionArray[index];
+        if (self.userNameInput != nil) {
+            self.userNameInput.placeholder = self.userNameStr;
+        }
     }];
     [mainView addSubview:signInWith];
     [signInWith mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -179,12 +187,13 @@
 
     QMUITextField *userNameField = [[QMUITextField alloc] init];
     userNameField.textInsets = UIEdgeInsetsMake(0, 8, 0, 0);
-    userNameField.placeholder = kString(@"auth_user_name_placeholder");
+    userNameField.placeholder = self.userNameStr;
     userNameField.layer.cornerRadius = 3;
     userNameField.layer.masksToBounds = YES;
     userNameField.layer.borderWidth = 1;
     userNameField.layer.borderColor = [Common fieldBorderColor].CGColor;
     [mainView addSubview:userNameField];
+    self.userNameInput = userNameField;
 
     [userNameField mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(signInWith.mas_bottom).mas_offset(16);

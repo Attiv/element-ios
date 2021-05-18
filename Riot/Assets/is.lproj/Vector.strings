@@ -488,3 +488,6 @@
 "phone" = "phone";
 "sign_in_with" = "sign_in_with";
 "password" = "password";
+"set_a_new_one" = "set_a_new_one";
+"not_sure_of_your_password" = "not_sure_of_your_password";
+"create_account" = "create_account";
