@@ -487,7 +487,7 @@
     }];
 //    self.registerView.hidden = YES;
 //    self.loginView.hidden = NO;
-    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
+    [UIView transitionWithView:self.view duration:0.3 options:UIViewAnimationOptionTransitionFlipFromRight animations:^{
         self.registerView.hidden = YES;
         self.loginView.hidden = NO;
     } completion:nil];
