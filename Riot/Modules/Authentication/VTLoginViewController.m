@@ -206,6 +206,7 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	passwordField.layer.borderWidth = 1;
 	passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
 	[mainView addSubview:passwordField];
+	self.passwordInput = passwordField;
 
 	[passwordField mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.left.mas_equalTo(userNameField.mas_left);
@@ -378,7 +379,6 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	passwordField.layer.borderWidth = 1;
 	passwordField.secureTextEntry = YES;
 	passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
-	self.passwordInput = passwordField;
 	self.registerPasswordInput = passwordField;
 	[registerView addSubview:passwordField];
 
