@@ -4786,6 +4786,10 @@ internal enum VectorL10n {
   internal static func userVerificationStartWaitingPartner(_ p1: String) -> String {
     return VectorL10n.tr("Vector", "user_verification_start_waiting_partner", p1)
   }
+  /// Username or password can't be null
+  internal static var usernameOrPasswordCanNotBeNull: String { 
+    return VectorL10n.tr("Vector", "username_or_password_can_not_be_null") 
+  }
   /// Video
   internal static var video: String { 
     return VectorL10n.tr("Vector", "video") 

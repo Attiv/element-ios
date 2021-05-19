@@ -1647,4 +1647,5 @@ Tap the + to start adding people.";
 "sign_in_here" = "Sign in here";
 "already_have_account" = "Already have an account";
 "register" = "Register";
+"username_or_password_can_not_be_null" = "Username or password can't be null";
 

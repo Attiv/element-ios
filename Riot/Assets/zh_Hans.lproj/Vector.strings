@@ -1261,3 +1261,4 @@
 "sign_in_here" = "点击登录";
 "already_have_account" = "已经拥有账号";
 "register" = "注册";
+"username_or_password_can_not_be_null" = "用户名和密码不能为空";
