@@ -157,7 +157,7 @@ const NSInteger userNameLengthLimit = 2;
 	signInWith.selectedRowColor = [UIColor lightGrayColor];
 	signInWith.layer.borderWidth = 1;
 	signInWith.layer.borderColor = [Common fieldBorderColor].CGColor;
-	signInWith.optionArray = @[kString(@"auth_user_name_placeholder"), kString(@"email_address"), kString(@"phone")];
+	signInWith.optionArray = @[kString(@"auth_user_name_placeholder"), kString(@"email_addresses"), kString(@"phone")];
 	signInWith.optionIds = @[@1, @2, @3];
 	signInWith.selectedIndex = 0;
 	signInWith.text = signInWith.optionArray[0];
@@ -921,7 +921,6 @@ const NSInteger userNameLengthLimit = 2;
 
 - (void)textFieldDidChange:(UITextField *)textField {
 	if (textField.markedTextRange == nil) {
-		WLog(@"text:%@", textField.text);
 		if (textField.tag == loginPasswordTag) {
 			if (textField.text.length > 5 && self.userNameInput.text.length >= userNameLengthLimit) {
 				self.loginButton.enabled = YES;
