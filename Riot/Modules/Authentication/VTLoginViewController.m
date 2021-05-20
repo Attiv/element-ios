@@ -299,6 +299,7 @@ const NSInteger userNameLengthLimit = 2;
 	languageList.optionIds = @[@0, @1];
 	__block NSArray *languages = @[English_US, Chinese_Simple];
 	NSString *currentLanguage = [Common currentLanguage];
+	currentLanguage = currentLanguage != nil ? currentLanguage : English_US;
 	NSInteger idx = [languages indexOfObject:currentLanguage];
 	languageList.selectedIndex = idx;
 	languageList.text = languageList.optionArray[idx];

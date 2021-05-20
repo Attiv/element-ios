@@ -1,4 +1,4 @@
-// 
+//
 // Copyright 2021 New Vector Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +27,12 @@ static const char _bundle = 0;
 
 
 - (NSString *)localizedStringForKey:(NSString *)key value:(NSString *)value table:(NSString *)tableName {
-    NSBundle *bundle = objc_getAssociatedObject(self, &_bundle);
-    NSString *language = [Common currentLanguage];
-    if (nil == bundle) {
-        bundle = [[NSBundle mainBundle] pathForResource:language ofType:@"lproj"];
-    }
-    return [bundle localizedStringForKey:key value:value table:tableName];
+	NSBundle *bundle = objc_getAssociatedObject(self, &_bundle);
+	NSString *language = [Common currentLanguage];
+	if (nil == bundle) {
+		bundle = [[NSBundle mainBundle] pathForResource:language ofType:@"lproj"];
+	}
+	return [bundle localizedStringForKey:key value:value table:tableName];
 //    return bundle ? [bundle localizedStringForKey:key value:value table:tableName] : [super localizedStringForKey:key value:value table:tableName];
 }
 
@@ -41,12 +41,12 @@ static const char _bundle = 0;
 @implementation NSBundle (Language)
 
 + (void)setLanguage:(NSString *)language {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        object_setClass([NSBundle mainBundle], [BundleEx class]);
-    });
-    
-    objc_setAssociatedObject([NSBundle mainBundle], &_bundle, language ? [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:language ofType:@"lproj"]] : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		object_setClass([NSBundle mainBundle], [BundleEx class]);
+	});
+
+	objc_setAssociatedObject([NSBundle mainBundle], &_bundle, language ? [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:language ofType:@"lproj"]] : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

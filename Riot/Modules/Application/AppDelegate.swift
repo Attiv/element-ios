@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         IQKeyboardManager.shared.enable = true
 
-        Common.initLanguage()
+//        Common.initLanguage()
         // Setup window
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window

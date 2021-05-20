@@ -18,6 +18,8 @@
 
 #import "LegacyAppDelegate.h"
 
+#import "NSBundle+language.h"
+#import "PrefixHeader.pch"
 #import <Intents/Intents.h>
 #import <Contacts/Contacts.h>
 
@@ -379,6 +381,7 @@ NSString *const AppDelegateUniversalLinkDidChangeNotification = @"AppDelegateUni
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeLanguage) name:kChangeLanguageNotify object:nil];
 	NSDate *startDate = [NSDate date];
 
@@ -412,23 +415,26 @@ NSString *const AppDelegateUniversalLinkDidChangeNotification = @"AppDelegateUni
 	// Set up theme
 	ThemeService.shared.themeId = RiotSettings.shared.userInterfaceTheme;
 
-	// Set up runtime language and fallback by considering the userDefaults object shared within the application group.
-	NSUserDefaults *sharedUserDefaults = [MXKAppSettings standardAppSettings].sharedUserDefaults;
-	NSString *language = [sharedUserDefaults objectForKey:@"appLanguage"];
-	if (!language)
-	{
-		// Check whether a langage was only defined at the Riot application level.
-		language = [[NSUserDefaults standardUserDefaults] objectForKey:@"appLanguage"];
-		if (language)
-		{
-			// Move this setting into the shared userDefaults object to apply it to the extensions.
-			[sharedUserDefaults setObject:language forKey:@"appLanguage"];
+	[Common initLanguage];
+	[NSBundle setLanguage:[Common currentLanguage]];
 
-			[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"appLanguage"];
-		}
-	}
-	[NSBundle mxk_setLanguage:language];
-	[NSBundle mxk_setFallbackLanguage:@"en"];
+	// Set up runtime language and fallback by considering the userDefaults object shared within the application group.
+//	NSUserDefaults *sharedUserDefaults = [MXKAppSettings standardAppSettings].sharedUserDefaults;
+//	NSString *language = [sharedUserDefaults objectForKey:@"appLanguage"];
+//	if (!language)
+//	{
+	// Check whether a langage was only defined at the Riot application level.
+//		language = [[NSUserDefaults standardUserDefaults] objectForKey:@"appLanguage"];
+//		if (language)
+//		{
+	// Move this setting into the shared userDefaults object to apply it to the extensions.
+//			[sharedUserDefaults setObject:language forKey:@"appLanguage"];
+
+//			[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"appLanguage"];
+//		}
+//	}
+//	[NSBundle mxk_setLanguage:language];
+//	[NSBundle mxk_setFallbackLanguage:@"en"];
 
 	mxSessionArray = [NSMutableArray array];
 	callEventsListeners = [NSMutableDictionary dictionary];
