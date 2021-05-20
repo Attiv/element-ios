@@ -566,7 +566,7 @@ const NSInteger userNameLengthLimit = 2;
 	                                   // Sanity check
 	                                   if (!credentials.userId || !credentials.accessToken)
 					   {
-						   [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]];
+						   [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:kString(@"not_supported_yet")}]];
 					   }
 	                                   else
 					   {
@@ -624,7 +624,7 @@ const NSInteger userNameLengthLimit = 2;
 	// Sanity check: check whether the user is not already logged in with this id
 	else if ([[MXKAccountManager sharedManager] accountForUserId:credentials.userId])
 	{
-		[QMUITips showError:[NSBundle mxk_localizedStringForKey:@"login_error_already_logged_in"] inView:self.view hideAfterDelay:2.0];
+		[QMUITips showError:kString(@"login_error_already_logged_in") inView:self.view hideAfterDelay:2.0];
 	}
 	else
 	{
@@ -776,15 +776,15 @@ const NSInteger userNameLengthLimit = 2;
 	{
 		if (self.authType == MXKAuthenticationTypeLogin)
 		{
-			title = [NSBundle mxk_localizedStringForKey:@"login_error_title"];
+			title = kString(@"login_error_title");
 		}
 		else if (self.authType == MXKAuthenticationTypeRegister)
 		{
-			title = [NSBundle mxk_localizedStringForKey:@"register_error_title"];
+			title = kString(@"register_error_title");
 		}
 		else
 		{
-			title = [NSBundle mxk_localizedStringForKey:@"error"];
+			title = kString(@"error");
 		}
 	}
 	NSString* message = error.localizedDescription;
@@ -805,31 +805,31 @@ const NSInteger userNameLengthLimit = 2;
 		{
 			if ([errCode isEqualToString:kMXErrCodeStringForbidden])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_forbidden"];
+				message = kString(@"login_error_forbidden");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringUnknownToken])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_unknown_token"];
+				message = kString(@"login_error_unknown_token");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringBadJSON])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_bad_json"];
+				message = kString(@"login_error_bad_json");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringNotJSON])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_not_json"];
+				message = kString(@"login_error_not_json");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringLimitExceeded])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_limit_exceeded"];
+				message = kString(@"login_error_limit_exceeded");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringUserInUse])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_user_in_use"];
+				message = kString(@"login_error_user_in_use");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringLoginEmailURLNotYet])
 			{
-				message = [NSBundle mxk_localizedStringForKey:@"login_error_login_email_not_yet"];
+				message = kString(@"login_error_login_email_not_yet");
 			}
 			else if ([errCode isEqualToString:kMXErrCodeStringResourceLimitExceeded])
 			{
@@ -869,20 +869,20 @@ const NSInteger userNameLengthLimit = 2;
 		adminContact = [NSURL URLWithString:adminContactString];
 	}
 
-	NSString *title = [NSBundle mxk_localizedStringForKey:@"login_error_resource_limit_exceeded_title"];
+	NSString *title = kString(@"login_error_resource_limit_exceeded_title");
 
 	// Build the message content
 	NSMutableString *message = [NSMutableString new];
 	if ([limitType isEqualToString:kMXErrorResourceLimitExceededLimitTypeMonthlyActiveUserValue])
 	{
-		[message appendString:[NSBundle mxk_localizedStringForKey:@"login_error_resource_limit_exceeded_message_monthly_active_user"]];
+		[message appendString: kString(@"login_error_resource_limit_exceeded_message_monthly_active_user")];
 	}
 	else
 	{
-		[message appendString:[NSBundle mxk_localizedStringForKey:@"login_error_resource_limit_exceeded_message_default"]];
+		[message appendString:kString(@"login_error_resource_limit_exceeded_message_default")];
 	}
 
-	[message appendString:[NSBundle mxk_localizedStringForKey:@"login_error_resource_limit_exceeded_message_contact"]];
+	[message appendString:kString(@"login_error_resource_limit_exceeded_message_contact")];
 
 
 	[QMUITips showError:message inView:self.view hideAfterDelay:2.0];
@@ -966,12 +966,12 @@ const NSInteger userNameLengthLimit = 2;
 							     // Else prompt the user by displaying a fingerprint (SHA256) of the certificat
 							     __block BOOL isTrusted;
 							     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-							     NSString *title = [NSBundle mxk_localizedStringForKey:@"ssl_could_not_verify"];
-							     NSString *homeserverURLStr = [NSString stringWithFormat:[NSBundle mxk_localizedStringForKey:@"ssl_homeserver_url"], self.homeServerUrl];
-							     NSString *fingerprint = [NSString stringWithFormat:[NSBundle mxk_localizedStringForKey:@"ssl_fingerprint_hash"], @"SHA256"];
+							     NSString *title = kString(@"ssl_could_not_verify");
+							     NSString *homeserverURLStr = [NSString stringWithFormat:kString(@"ssl_homeserver_url"), self.homeServerUrl];
+							     NSString *fingerprint = [NSString stringWithFormat:kString(@"ssl_fingerprint_hash"), @"SHA256"];
 							     NSString *certFingerprint = [certificate mx_SHA256AsHexString];
 
-							     NSString *msg = [NSString stringWithFormat:@"%@\n\n%@\n\n%@\n\n%@\n\n%@\n\n%@", [NSBundle mxk_localizedStringForKey:@"ssl_cert_not_trust"], [NSBundle mxk_localizedStringForKey:@"ssl_cert_new_account_expl"], homeserverURLStr, fingerprint, certFingerprint, [NSBundle mxk_localizedStringForKey:@"ssl_only_accept"]];
+							     NSString *msg = [NSString stringWithFormat:@"%@\n\n%@\n\n%@\n\n%@\n\n%@\n\n%@", kString(@"ssl_cert_not_trust"), kString(@"ssl_cert_new_account_expl"), homeserverURLStr, fingerprint, certFingerprint, kString(@"ssl_only_accept")];
 							     dispatch_async(dispatch_get_main_queue(), ^{
 										    [QMUITips showError:msg inView:self.view hideAfterDelay:2];
 									    });
