@@ -45,6 +45,11 @@ NSString *const kMXLoginIdentifierTypeThirdParty = @"m.id.thirdparty";
 NSString *const kMXLoginIdentifierTypePhone = @"m.id.phone";
 
 const NSString *defaultHomeServerUrl = @"https://matrix.org";
+const NSInteger loginPasswordTag = 99999;
+const NSInteger registerPasswordTag = 99998;
+const NSInteger usernameTag = 99997;
+const NSInteger registerUsernameTag = 99996;
+const NSInteger userNameLengthLimit = 2;
 
 @interface VTLoginViewController ()
 
@@ -56,6 +61,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 @property(nonatomic, strong) QMUITextField *registerEmailInput;
 @property(nonatomic, strong) QMUITextField *registerConfirmPasswordInput;
 @property(nonatomic, strong) QMUITextField *registerPasswordInput;
+@property(nonatomic, strong) QMUIButton *loginButton;
+@property(nonatomic, strong) QMUIButton *registerButton;
 @property(nonatomic, strong) UIView *loginView;
 @property(nonatomic, strong) UIView *registerView;
 @property(nonatomic, strong) UIScrollView *scrollView;
@@ -186,6 +193,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	userNameField.layer.cornerRadius = 3;
 	userNameField.layer.masksToBounds = YES;
 	userNameField.layer.borderWidth = 1;
+	userNameField.tag = usernameTag;
+	[userNameField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
 	userNameField.layer.borderColor = [Common fieldBorderColor].CGColor;
 	[mainView addSubview:userNameField];
 	self.userNameInput = userNameField;
@@ -205,6 +214,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	passwordField.secureTextEntry = YES;
 	passwordField.layer.borderWidth = 1;
 	passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
+	passwordField.tag = loginPasswordTag;
+	[passwordField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
 	[mainView addSubview:passwordField];
 	self.passwordInput = passwordField;
 
@@ -248,6 +259,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 
 	[signInButton setTitle:NSLocalizedStringFromTable(@"auth_softlogout_sign_in", @"Vector", nil) forState:UIControlStateNormal];
 	signInButton.titleLabel.font = [UIFont systemFontOfSize:14.0];
+	signInButton.enabled = NO;
+	self.loginButton = signInButton;
 
 	[mainView addSubview:signInButton];
 	[signInButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -361,6 +374,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	userNameField.layer.masksToBounds = YES;
 	userNameField.layer.borderWidth = 1;
 	userNameField.layer.borderColor = [Common fieldBorderColor].CGColor;
+	userNameField.tag = registerUsernameTag;
+	[userNameField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
 	[registerView addSubview:userNameField];
 	self.registerUserNameInput = userNameField;
 
@@ -379,6 +394,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	passwordField.layer.borderWidth = 1;
 	passwordField.secureTextEntry = YES;
 	passwordField.layer.borderColor = [Common fieldBorderColor].CGColor;
+	passwordField.tag = registerPasswordTag;
+	[passwordField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
 	self.registerPasswordInput = passwordField;
 	[registerView addSubview:passwordField];
 
@@ -458,6 +475,8 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 
 	[registerButton setTitle:kString(@"register") forState:UIControlStateNormal];
 	registerButton.titleLabel.font = [UIFont systemFontOfSize:14.0];
+	registerButton.enabled = NO;
+	self.registerButton = registerButton;
 
 	[registerView addSubview:registerButton];
 	[registerButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -520,6 +539,11 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 
 - (void)signInButtonClicked {
 
+	if (self.userNameInput.text.length < userNameLengthLimit || self.passwordInput.text.length < 6) {
+		return;
+	}
+
+	[QMUITips showLoadingInView:self.view];
 	[self checkBeforeLogin];
 
 	NSDictionary *parameters = @{
@@ -534,6 +558,7 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 	};
 
 	self.mxCurrentOperation = [self.mxRestClient login:parameters success:^(NSDictionary *JSONResponse) {
+	                                   [QMUITips hideAllTips];
 	                                   MXLoginResponse *loginResponse;
 	                                   MXJSONModelSetMXJSONModel(loginResponse, MXLoginResponse, JSONResponse);
 	                                   MXCredentials *credentials = [[MXCredentials alloc] initWithLoginResponse:loginResponse andDefaultCredentials:self.mxRestClient.credentials];
@@ -552,6 +577,7 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 						   [self onSuccessfulLogin:credentials];
 					   }
 				   } failure:^(NSError *error) {
+	                                   [QMUITips hideAllTips];
 	                                   [self onFailureDuringAuthRequest:error];
 				   }];
 
@@ -889,6 +915,39 @@ const NSString *defaultHomeServerUrl = @"https://matrix.org";
 //	[self.authInputsView setAuthSession:self.authInputsView.authSession withAuthType:_authType];
 }
 
+
+#pragma mark - UITextField
+
+- (void)textFieldDidChange:(UITextField *)textField {
+	if (textField.markedTextRange == nil) {
+		WLog(@"text:%@", textField.text);
+		if (textField.tag == loginPasswordTag) {
+			if (textField.text.length > 5 && self.userNameInput.text.length >= userNameLengthLimit) {
+				self.loginButton.enabled = YES;
+			} else {
+				self.loginButton.enabled = NO;
+			}
+		} else if (textField.tag == registerPasswordTag) {
+			if (textField.text.length > 5 && self.registerUserNameInput.text.length >= userNameLengthLimit) {
+				self.registerButton.enabled = YES;
+			} else {
+				self.registerButton.enabled = NO;
+			}
+		} else if (textField.tag == usernameTag) {
+			if (textField.text.length > 5 && self.passwordInput.text.length >= 6) {
+				self.loginButton.enabled = YES;
+			} else {
+				self.loginButton.enabled = NO;
+			}
+		} else if (textField.tag == registerUsernameTag) {
+			if (textField.text.length > 5 && self.registerPasswordInput.text.length >= 6) {
+				self.registerButton.enabled = YES;
+			} else {
+				self.registerButton.enabled = NO;
+			}
+		}
+	}
+}
 
 #pragma mark - Matrix Related
 
