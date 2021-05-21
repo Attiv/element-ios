@@ -521,21 +521,258 @@ const NSInteger userNameLengthLimit = 2;
 }
 
 - (void)registerButtonClicked {
+	NSString *errorMsg = [self checkBeforeRegister];
+	if (errorMsg != nil) {
+		[QMUITips showError:errorMsg inView:self.view hideAfterDelay:2];
+		return;
+	}
+	[QMUITips showLoadingInView:self.view];
 
+	[self testUserRegistration:^(MXError *mxError) {
+	         [QMUITips hideAllTipsInView:self.view];
+	         if ([mxError.errcode isEqualToString:kMXErrCodeStringUserInUse])
+		 {
+			 WLog(@"[AuthenticationVC] User name is already use");
+			 [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:kString(@"auth_username_in_use")}]];
+		 }
+	         //   - the server quota limits is not reached
+	         else if ([mxError.errcode isEqualToString:kMXErrCodeStringResourceLimitExceeded])
+		 {
+			 [self showResourceLimitExceededError:mxError.userInfo];
+		 }
+	         else
+		 {
 
+		 }
+	         if (mxError == nil) {
+			 [self registerStart];
+		 }
+	 }];
 }
 
-- (void)checkBeforeLogin {
+- (NSString *)checkBeforeLogin {
 	NSString *userName = self.userNameInput.text;
 	userName = [userName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 	NSString *password = self.passwordInput.text;
-
+	NSString *errorMsg = nil;
 	if (!userName.length || !password) {
-		NSString *errorMsg = kString(@"username_or_password_can_not_be_null");
-		[QMUITips showError:errorMsg inView:self.view hideAfterDelay:1.5];
-		return;
+		errorMsg = kString(@"username_or_password_can_not_be_null");
+//		[QMUITips showError:errorMsg inView:self.view hideAfterDelay:1.5];
 	}
+	return errorMsg;
 
+}
+
+- (void)testUserRegistration:(void (^)(MXError *mxError))callback
+{
+	self.mxCurrentOperation = [self.mxRestClient testUserRegistration:self.registerUserNameInput.text callback:callback];
+}
+
+
+-(NSString *) checkBeforeRegister {
+	NSString *errorMsg = nil;
+	if (!self.registerUserNameInput.text.length)
+	{
+		WLog(@"[AuthInputsView] Invalid user name");
+		errorMsg = kString(@"auth_invalid_user_name");
+	}
+	else if (!self.registerPasswordInput.text.length)
+	{
+		WLog(@"[AuthInputsView] Missing Passwords");
+		errorMsg = kString(@"auth_missing_password");
+	}
+	else if (self.registerPasswordInput.text.length < 6)
+	{
+		WLog(@"[AuthInputsView] Invalid Passwords");
+		errorMsg = kString(@"auth_invalid_password");
+	}
+	else if ([self.registerConfirmPasswordInput.text isEqualToString:self.registerPasswordInput.text] == NO)
+	{
+		WLog(@"[AuthInputsView] Passwords don't match");
+		errorMsg = kString(@"auth_password_dont_match");
+	}
+	else
+	{
+		// Check validity of the non empty user name
+		NSString *user = self.registerUserNameInput.text;
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[a-z0-9.\\-_]+$" options:NSRegularExpressionCaseInsensitive error:nil];
+
+		if ([regex firstMatchInString:user options:0 range:NSMakeRange(0, user.length)] == nil)
+		{
+			WLog(@"[AuthInputsView] Invalid user name");
+			errorMsg = kString(@"auth_invalid_user_name");
+		}
+	}
+	return errorMsg;
+}
+
+-(void)registerStart {
+	// Trigger here a register request in order to associate the filled userId and password to the current session id
+	// This will check the availability of the userId at the same time
+	[QMUITips showLoadingInView:self.view];
+	NSDictionary *parameters = @{@"auth": @{},
+	                             @"username": self.registerUserNameInput.text,
+	                             @"password": self.registerPasswordInput.text,
+	                             @"bind_email": @(NO),
+	                             @"initial_device_display_name":@"Mobile"};
+
+	self.mxCurrentOperation = [self.mxRestClient registerWithParameters:parameters success:^(NSDictionary *JSONResponse) {
+
+	                                   [QMUITips hideAllTipsInView:self.view];
+	                                   // Unexpected case where the registration succeeds without any other stages
+	                                   MXLoginResponse *loginResponse;
+	                                   MXJSONModelSetMXJSONModel(loginResponse, MXLoginResponse, JSONResponse);
+
+	                                   MXCredentials *credentials = [[MXCredentials alloc] initWithLoginResponse:loginResponse
+	                                                                 andDefaultCredentials:self.mxRestClient.credentials];
+
+	                                   // Sanity check
+	                                   if (!credentials.userId || !credentials.accessToken)
+					   {
+						   [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]];
+					   }
+	                                   else
+					   {
+						   WLog(@"[MXKAuthenticationVC] Registration succeeded");
+
+						   // Report the certificate trusted by user (if any)
+						   credentials.allowedCertificate = self.mxRestClient.allowedCertificate;
+
+						   [self onSuccessfulLogin:credentials];
+					   }
+
+				   } failure:^(NSError *error) {
+	                                   [QMUITips hideAllTipsInView:self.view];
+
+	                                   self.mxCurrentOperation = nil;
+
+	                                   // An updated authentication session should be available in response data in case of unauthorized request.
+	                                   NSDictionary *JSONResponse = nil;
+	                                   if (error.userInfo[MXHTTPClientErrorResponseDataKey])
+					   {
+						   JSONResponse = error.userInfo[MXHTTPClientErrorResponseDataKey];
+					   }
+
+	                                   if (JSONResponse)
+					   {
+						   MXAuthenticationSession *authSession = [MXAuthenticationSession modelFromJSON:JSONResponse];
+
+
+
+						   // Update session identifier
+//						   self.authInputsView.authSession.session = authSession.session;
+
+						   // Launch registration by preparing parameters dict
+						   [self prepareParameters:^(NSDictionary *parameters, NSError *error) {
+
+						            if (parameters && self.mxRestClient)
+							    {
+
+								    [self registerWithParameters:parameters];
+							    }
+						            else
+							    {
+								    WLog(@"[MXKAuthenticationVC] Failed to prepare parameters");
+								    [self onFailureDuringAuthRequest:error];
+							    }
+
+						    }];
+					   }
+	                                   else
+					   {
+						   [self onFailureDuringAuthRequest:error];
+					   }
+				   }];
+}
+
+
+- (void)registerWithParameters:(NSDictionary*)parameters
+{
+
+	// Add the device name
+	NSMutableDictionary *theParameters = [NSMutableDictionary dictionaryWithDictionary:parameters];
+	theParameters[@"initial_device_display_name"] = @"Mobile";
+
+	self.mxCurrentOperation = [self.mxRestClient registerWithParameters:theParameters success:^(NSDictionary *JSONResponse) {
+
+	                                   MXLoginResponse *loginResponse;
+	                                   MXJSONModelSetMXJSONModel(loginResponse, MXLoginResponse, JSONResponse);
+
+	                                   MXCredentials *credentials = [[MXCredentials alloc] initWithLoginResponse:loginResponse
+	                                                                 andDefaultCredentials:self.mxRestClient.credentials];
+
+	                                   // Sanity check
+	                                   if (!credentials.userId || !credentials.accessToken)
+					   {
+						   [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:kString(@"not_supported_yet")}]];
+					   }
+	                                   else
+					   {
+						   WLog(@"[MXKAuthenticationVC] Registration succeeded");
+
+						   // Report the certificate trusted by user (if any)
+						   credentials.allowedCertificate = self.mxRestClient.allowedCertificate;
+
+						   [self onSuccessfulLogin:credentials];
+					   }
+
+				   } failure:^(NSError *error) {
+
+	                                   self.mxCurrentOperation = nil;
+
+	                                   // Check whether the authentication is pending (for example waiting for email validation)
+	                                   MXError *mxError = [[MXError alloc] initWithNSError:error];
+	                                   if (mxError && [mxError.errcode isEqualToString:kMXErrCodeStringUnauthorized])
+					   {
+						   WLog(@"[MXKAuthenticationVC] Wait for email validation");
+
+						   // Postpone a new attempt in 10 sec
+//            self->registrationTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(registrationTimerFireMethod:) userInfo:parameters repeats:NO];
+					   }
+	                                   else
+					   {
+						   // The completed stages should be available in response data in case of unauthorized request.
+						   NSDictionary *JSONResponse = nil;
+						   if (error.userInfo[MXHTTPClientErrorResponseDataKey])
+						   {
+							   JSONResponse = error.userInfo[MXHTTPClientErrorResponseDataKey];
+						   }
+
+						   if (JSONResponse)
+						   {
+							   MXAuthenticationSession *authSession = [MXAuthenticationSession modelFromJSON:JSONResponse];
+
+							   if (authSession.completed)
+							   {
+								   [QMUITips hideAllTipsInView:self.view];
+//								   [self->_authenticationActivityIndicator stopAnimating];
+
+								   // Update session identifier in case of change
+
+//								   self.authInputsView.authSession.session = authSession.session;
+
+								   [self registerWithParameters:parameters];
+
+								   return;
+							   }
+
+							   [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]];
+						   }
+						   else
+						   {
+							   [self onFailureDuringAuthRequest:error];
+						   }
+					   }
+				   }];
+}
+
+- (void)prepareParameters:(void (^)(NSDictionary *parameters, NSError *error))callback
+{
+	// Do nothing by default
+	if (callback)
+	{
+		callback (nil, [NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:kString(@"not_supported_yet")}]);
+	}
 }
 
 - (void)signInButtonClicked {
@@ -545,17 +782,21 @@ const NSInteger userNameLengthLimit = 2;
 	}
 
 	[QMUITips showLoadingInView:self.view];
-	[self checkBeforeLogin];
+	NSString *errorMsg = [self checkBeforeLogin];
+	if (errorMsg != nil) {
+		[self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:errorMsg}]];
+		return;
+	}
 
 	NSDictionary *parameters = @{
-		@"type": kMXLoginFlowTypePassword,
-		@"identifier": @{
-			@"type": kMXLoginIdentifierTypeUser,
-			@"user": self.userNameInput.text
+	        @"type": kMXLoginFlowTypePassword,
+	        @"identifier": @{
+	                @"type": kMXLoginIdentifierTypeUser,
+	                @"user": self.userNameInput.text
 		},
-		@"password": self.passwordInput.text,
-		@"user": self.userNameInput.text,
-		@"initial_device_display_name": @"Mobile"
+	        @"password": self.passwordInput.text,
+	        @"user": self.userNameInput.text,
+	        @"initial_device_display_name": @"Mobile"
 	};
 
 	self.mxCurrentOperation = [self.mxRestClient login:parameters success:^(NSDictionary *JSONResponse) {
@@ -746,6 +987,21 @@ const NSInteger userNameLengthLimit = 2;
 //            [self dismiss];
 		}
 	}
+}
+
+- (void)showResourceLimitExceededError:(NSDictionary *)errorDict
+{
+	WLog(@"[AuthenticationVC] showResourceLimitExceededError");
+
+	[self showResourceLimitExceededError:errorDict onAdminContactTapped:^(NSURL *adminContactURL) {
+
+	         [[UIApplication sharedApplication] vc_open:adminContactURL completionHandler:^(BOOL success) {
+	                  if (!success)
+			  {
+				  WLog(@"[AuthenticationVC] adminContact(%@) cannot be opened", adminContactURL);
+			  }
+		  }];
+	 }];
 }
 
 - (void)unregisterSessionStateChangeNotification
