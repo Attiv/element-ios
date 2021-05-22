@@ -44,7 +44,8 @@ NSString *const kMXLoginIdentifierTypeUser = @"m.id.user";
 NSString *const kMXLoginIdentifierTypeThirdParty = @"m.id.thirdparty";
 NSString *const kMXLoginIdentifierTypePhone = @"m.id.phone";
 
-const NSString *defaultHomeServerUrl = @"https://matrix.org";
+//const NSString *defaultHomeServerUrl = @"https://matrix.org";
+const NSString *defaultHomeServerUrl = @"https://kelare.istory.cc:8448";
 const NSInteger loginPasswordTag = 99999;
 const NSInteger registerPasswordTag = 99998;
 const NSInteger usernameTag = 99997;
@@ -73,6 +74,12 @@ const NSInteger userNameLengthLimit = 2;
 @property (nonatomic) NSDictionary* externalRegistrationParameters;
 @property (nonatomic) MXKAuthenticationType authType;
 @property (nonatomic) MXCredentials *softLogoutCredentials;
+/**
+   The current authentication session if any.
+ */
+@property (nonatomic, readonly) MXAuthenticationSession *authSession;
+//@property (nonatomic, strong) MXAuthenticationSession *currentSession;
+@property (nonatomic, strong) NSString *session;
 
 @end
 
@@ -658,13 +665,13 @@ const NSInteger userNameLengthLimit = 2;
 					   {
 						   MXAuthenticationSession *authSession = [MXAuthenticationSession modelFromJSON:JSONResponse];
 
-
+						   self.session = authSession.session;
 
 						   // Update session identifier
 //						   self.authInputsView.authSession.session = authSession.session;
 
 						   // Launch registration by preparing parameters dict
-						   [self prepareParameters:^(NSDictionary *parameters, NSError *error) {
+						   [self prepareRegisterParameters:^(NSDictionary *parameters, NSError *error) {
 
 						            if (parameters && self.mxRestClient)
 							    {
@@ -751,9 +758,13 @@ const NSInteger userNameLengthLimit = 2;
 								   // Update session identifier in case of change
 
 //								   self.authInputsView.authSession.session = authSession.session;
+								   self.session = authSession.session;
 
-								   [self registerWithParameters:parameters];
-
+								   [self prepareRegisterParameters:^(NSDictionary *parameters, NSError *error) {
+								            if (parameters && self.mxRestClient) {
+										    [self registerWithParameters:parameters];
+									    }
+								    }];
 								   return;
 							   }
 
@@ -767,12 +778,21 @@ const NSInteger userNameLengthLimit = 2;
 				   }];
 }
 
-- (void)prepareParameters:(void (^)(NSDictionary *parameters, NSError *error))callback
+- (void)prepareRegisterParameters:(void (^)(NSDictionary *parameters, NSError *error))callback
 {
 	// Do nothing by default
 	if (callback)
 	{
-		callback (nil, [NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:kString(@"not_supported_yet")}]);
+		NSDictionary *parameters;
+		parameters = @{
+		        @"auth": @{
+		                @"session":self.session,
+		                @"type": kMXLoginFlowTypeDummy
+			},
+		        @"username": self.registerUserNameInput.text,
+		        @"password": self.registerPasswordInput.text,
+		};
+		callback(parameters, nil);
 	}
 }
 
@@ -849,6 +869,8 @@ const NSInteger userNameLengthLimit = 2;
 
 	// Wait for session change to present complete security screen if needed
 	[self registerSessionStateChangeNotificationForSession:session];
+
+	[self loginSuccess];
 }
 
 - (void)onSuccessfulLogin:(MXCredentials*)credentials
@@ -1257,6 +1279,20 @@ const NSInteger userNameLengthLimit = 2;
 - (void)setOnUnrecognizedCertificateBlock:(MXHTTPClientOnUnrecognizedCertificate)onUnrecognizedCertificateBlock
 {
 	self.onUnrecognizedCertificateCustomBlock = onUnrecognizedCertificateBlock;
+}
+
+
+#pragma mark - AuthView Methods
+- (void)checkIdentityServerRequirement:(MXRestClient*)mxRestClient
+        success:(void (^)(BOOL identityServerRequired))success
+        failure:(void (^)(NSError *error))failure
+{
+	[mxRestClient supportedMatrixVersions:^(MXMatrixVersions *matrixVersions) {
+
+	         WLog(@"[AuthInputsView] checkIdentityServerRequirement: %@", matrixVersions.doesServerRequireIdentityServerParam ? @"YES": @"NO");
+	         success(matrixVersions.doesServerRequireIdentityServerParam);
+
+	 } failure:failure];
 }
 
 #pragma mark - Lazyload
