@@ -81,6 +81,11 @@ const NSInteger userNameLengthLimit = 2;
 //@property (nonatomic, strong) MXAuthenticationSession *currentSession;
 @property (nonatomic, strong) NSString *session;
 
+/**
+   The identity service used to make identity server API requests.
+ */
+@property (nonatomic) MXIdentityService *identityService;
+
 @end
 
 @implementation VTLoginViewController
@@ -88,6 +93,8 @@ const NSInteger userNameLengthLimit = 2;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
+	MXAuthenticationSession *authSession = [MXAuthenticationSession modelFromJSON:@{@"flows":@[@{@"stages":@[kMXLoginFlowTypePassword]}]}];
+	[self setAuthSession:authSession withAuthType:MXKAuthenticationTypeLogin];
 	[self setupUI];
 	[self updateRESTClient];
 }
@@ -509,7 +516,9 @@ const NSInteger userNameLengthLimit = 2;
 	[UIView transitionWithView:self.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromRight animations:^{
 	         self.registerView.hidden = YES;
 	         self.loginView.hidden = NO;
-	 } completion:nil];
+	 } completion:^(BOOL finished) {
+	         self.authType = MXKAuthenticationTypeLogin;
+	 }];
 
 }
 
@@ -523,7 +532,9 @@ const NSInteger userNameLengthLimit = 2;
 	[UIView transitionWithView:self.view duration:0.5 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{
 	         self.registerView.hidden = NO;
 	         self.loginView.hidden = YES;
-	 } completion:nil];
+	 } completion:^(BOOL finished) {
+	         self.authType = MXKAuthenticationTypeRegister;
+	 }];
 
 
 }
@@ -563,10 +574,17 @@ const NSInteger userNameLengthLimit = 2;
 	userName = [userName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 	NSString *password = self.passwordInput.text;
 	NSString *errorMsg = nil;
-	if (!userName.length || !password) {
-		errorMsg = kString(@"username_or_password_can_not_be_null");
-//		[QMUITips showError:errorMsg inView:self.view hideAfterDelay:1.5];
+	if ([self isFlowSupported:kMXLoginFlowTypePassword])
+	{
+		if (!userName.length || !password) {
+			errorMsg = kString(@"username_or_password_can_not_be_null");
+		}
 	}
+	else
+	{
+		errorMsg = kString(@"not_supported_yet");
+	}
+
 	return errorMsg;
 
 }
@@ -609,6 +627,27 @@ const NSInteger userNameLengthLimit = 2;
 		{
 			WLog(@"[AuthInputsView] Invalid user name");
 			errorMsg = kString(@"auth_invalid_user_name");
+		}
+		// Check email field
+		if ([self isFlowSupported:kMXLoginFlowTypeEmailIdentity] && !self.registerEmailInput.text.length)
+		{
+			if (self.areAllThirdPartyIdentifiersRequired)
+			{
+				NSLog(@"[AuthInputsView] Missing email");
+				errorMsg = kString(@"auth_missing_email");
+			}
+		}
+
+	}
+	if (!errorMsg) {
+		if (self.registerEmailInput.text.length)
+		{
+			// Check validity of the non empty email
+			if (![MXTools isEmailAddress:self.registerEmailInput.text])
+			{
+				WLog(@"[AuthInputsView] Invalid email");
+				errorMsg = kString(@"auth_invalid_email");
+			}
 		}
 	}
 	return errorMsg;
@@ -759,6 +798,7 @@ const NSInteger userNameLengthLimit = 2;
 
 //								   self.authInputsView.authSession.session = authSession.session;
 								   self.session = authSession.session;
+								   self.authSession.session = authSession.session;
 
 								   [self prepareRegisterParameters:^(NSDictionary *parameters, NSError *error) {
 								            if (parameters && self.mxRestClient) {
@@ -778,20 +818,234 @@ const NSInteger userNameLengthLimit = 2;
 				   }];
 }
 
+/**
+   Check if a flow (kMXLoginFlowType*) has already been completed.
+
+   @param flow the flow type to check.
+   @return YES if the the flow has been completedd.
+ */
+- (BOOL)isFlowCompleted:(NSString *)flow
+{
+	if (currentSession.completed && [currentSession.completed indexOfObject:flow] != NSNotFound)
+	{
+		return YES;
+	}
+
+	return NO;
+}
+
 - (void)prepareRegisterParameters:(void (^)(NSDictionary *parameters, NSError *error))callback
 {
 	// Do nothing by default
 	if (callback)
 	{
 		NSDictionary *parameters;
-		parameters = @{
-		        @"auth": @{
-		                @"session":self.session,
-		                @"type": kMXLoginFlowTypeDummy
-			},
-		        @"username": self.registerUserNameInput.text,
-		        @"password": self.registerPasswordInput.text,
-		};
+		if (self.registerEmailInput.text.length && ![self isFlowCompleted:kMXLoginFlowTypeEmailIdentity])
+		{
+			WLog(@"[AuthInputsView] Prepare email identity stage");
+
+			// Retrieve the REST client from delegate
+			MXRestClient *restClient = self.mxRestClient;
+
+
+			if (restClient)
+			{
+				MXWeakify(self);
+				[self checkIdentityServerRequirement:restClient success:^(BOOL identityServerRequired) {
+				         MXStrongifyAndReturnIfNil(self);
+
+				         if (identityServerRequired && !restClient.identityServer)
+					 {
+						 callback(nil, [NSError errorWithDomain:MXKAuthErrorDomain
+						                code:0
+						                userInfo:@{
+						                        NSLocalizedDescriptionKey:kString(@"auth_email_is_required")
+							  }]);
+						 return;
+					 }
+
+				         // Check whether a second 3pid is available
+//				         self->_isThirdPartyIdentifierPending = (self->nbPhoneNumber && ![self isFlowCompleted:kMXLoginFlowTypeMSISDN]);
+
+				         // Launch email validation
+				         self->submittedEmail = [[MXK3PID alloc] initWithMedium:kMX3PIDMediumEmail andAddress:self.registerEmailInput.text];
+
+				         NSString *identityServer = restClient.identityServer;
+
+				         [self->submittedEmail requestValidationTokenWithMatrixRestClient:restClient
+				          isDuringRegistration:YES
+				          nextLink:nil
+				          success:^
+				          {
+				                  NSMutableDictionary *threepidCreds = [NSMutableDictionary dictionaryWithDictionary:@{
+				                                                                @"client_secret": self->submittedEmail.clientSecret,
+
+				                                                                @"sid": self->submittedEmail.sid
+						  }];
+				                  if (identityServer)
+						  {
+							  NSURL *identServerURL = [NSURL URLWithString:identityServer];
+							  threepidCreds[@"id_server"] = identServerURL.host;
+						  }
+
+				                  NSDictionary *parameters;
+				                  parameters = @{
+				                          @"auth": @{
+				                                  @"session":self->currentSession.session,
+				                                  @"threepid_creds": threepidCreds,
+				                                  @"type": kMXLoginFlowTypeEmailIdentity
+							  },
+				                          @"username": self.registerUserNameInput.text,
+				                          @"password": self.registerPasswordInput.text,
+						  };
+
+
+
+//				                  self.messageLabel.text = NSLocalizedStringFromTable(@"auth_email_validation_message", @"Vector", nil);
+//				                  self.messageLabel.hidden = NO;
+
+				                  callback(parameters, nil);
+
+					  }
+				          failure:^(NSError *error)
+				          {
+
+				                  WLog(@"[AuthInputsView] Failed to request email token");
+
+				                  // Ignore connection cancellation error
+				                  if (([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled))
+						  {
+							  return;
+						  }
+
+				                  // Translate the potential MX error.
+				                  MXError *mxError = [[MXError alloc] initWithNSError:error];
+				                  if (mxError && ([mxError.errcode isEqualToString:kMXErrCodeStringThreePIDInUse] || [mxError.errcode isEqualToString:kMXErrCodeStringServerNotTrusted]))
+						  {
+							  NSMutableDictionary *userInfo;
+							  if (error.userInfo)
+							  {
+								  userInfo = [NSMutableDictionary dictionaryWithDictionary:error.userInfo];
+							  }
+							  else
+							  {
+								  userInfo = [NSMutableDictionary dictionary];
+							  }
+
+							  userInfo[NSLocalizedFailureReasonErrorKey] = nil;
+
+							  if ([mxError.errcode isEqualToString:kMXErrCodeStringThreePIDInUse])
+							  {
+								  userInfo[NSLocalizedDescriptionKey] = kString(@"auth_email_in_use");
+								  userInfo[@"error"] = kString(@"auth_email_in_use");
+							  }
+							  else
+							  {
+								  userInfo[NSLocalizedDescriptionKey] = kString(@"auth_untrusted_id_server");
+								  userInfo[@"error"] = kString(@"auth_untrusted_id_server");
+							  }
+
+							  error = [NSError errorWithDomain:error.domain code:error.code userInfo:userInfo];
+						  }
+				                  callback(nil, error);
+
+					  }];
+				 } failure:^(NSError *error) {
+				         callback(nil, error);
+				 }];
+
+				// Async response
+				return;
+			}
+			WLog(@"[AuthInputsView] Authentication failed during the email identity stage");
+		}
+		else if ([self isFlowSupported:kMXLoginFlowTypeRecaptcha] && ![self isFlowCompleted:kMXLoginFlowTypeRecaptcha])
+		{
+			WLog(@"[AuthInputsView] Prepare reCaptcha stage");
+
+//			[self displayRecaptchaForm:^(NSString *response) {
+//
+//			         if (response.length)
+//				 {
+//					 NSDictionary *parameters = @{
+//					         @"auth": @{
+//					                 @"session":currentSession.session,
+//					                 @"response": response,
+//					                 @"type": kMXLoginFlowTypeRecaptcha
+//						 },
+//					         @"username": self.userLoginTextField.text,
+//					         @"password": self.passWordTextField.text,
+//					 };
+//
+//					 callback(parameters, nil);
+//				 }
+//			         else
+//				 {
+//					 NSLog(@"[AuthInputsView] reCaptcha stage failed");
+//					 callback(nil, [NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]);
+//				 }
+//
+//			 }];
+//
+//			// Async response
+//			return;
+		}
+		else if ([self isFlowSupported:kMXLoginFlowTypeDummy] && ![self isFlowCompleted:kMXLoginFlowTypeDummy])
+		{
+			parameters = @{
+			        @"auth": @{
+			                @"session":currentSession.session,
+			                @"type": kMXLoginFlowTypeDummy
+				},
+			        @"username": self.registerUserNameInput.text,
+			        @"password": self.registerPasswordInput.text,
+			};
+		}
+		else if ([self isFlowSupported:kMXLoginFlowTypePassword] && ![self isFlowCompleted:kMXLoginFlowTypePassword])
+		{
+			// Note: this use case was not tested yet.
+			parameters = @{
+			        @"auth": @{
+			                @"session":currentSession.session,
+			                @"username": self.registerUserNameInput.text,
+			                @"password": self.registerPasswordInput.text,
+			                @"type": kMXLoginFlowTypePassword
+				}
+			};
+		}
+		else if ([self isFlowSupported:kMXLoginFlowTypeTerms] && ![self isFlowCompleted:kMXLoginFlowTypeTerms])
+		{
+			NSLog(@"[AuthInputsView] Prepare terms stage");
+
+			MXWeakify(self);
+//			[self displayTermsView:^{
+//			         MXStrongifyAndReturnIfNil(self);
+//
+//			         NSDictionary *parameters = @{
+//			                 @"auth": @{
+//			                         @"session":self->currentSession.session,
+//			                         @"type": kMXLoginFlowTypeTerms
+//					 },
+//			                 @"username": self.userLoginTextField.text,
+//			                 @"password": self.passWordTextField.text
+//				 };
+//			         callback(parameters, nil);
+//			 }];
+//
+//			// Async response
+//			return;
+		}
+
+//		NSDictionary *parameters;
+//		parameters = @{
+//		        @"auth": @{
+//		                @"session":self.session,
+//		                @"type": kMXLoginFlowTypeDummy
+//			},
+//		        @"username": self.registerUserNameInput.text,
+//		        @"password": self.registerPasswordInput.text,
+//		};
+//		callback(parameters, nil);
 		callback(parameters, nil);
 	}
 }
@@ -1123,6 +1377,7 @@ const NSInteger userNameLengthLimit = 2;
 	}
 
 	[QMUITips showError:message inView:self.view hideAfterDelay:2.0];
+	[self setAuthSession:self.authSession withAuthType:_authType];
 	// Update authentication inputs view to return in initial step
 //	[self.authInputsView setAuthSession:self.authInputsView.authSession withAuthType:_authType];
 //	if (self.softLogoutCredentials)
@@ -1283,6 +1538,523 @@ const NSInteger userNameLengthLimit = 2;
 
 
 #pragma mark - AuthView Methods
+
+- (void)onReachabilityStatusChange:(NSNotification *)notif
+{
+	AFNetworkReachabilityManager *reachabilityManager = [AFNetworkReachabilityManager sharedManager];
+	AFNetworkReachabilityStatus status = reachabilityManager.networkReachabilityStatus;
+
+	if (status == AFNetworkReachabilityStatusReachableViaWiFi || status == AFNetworkReachabilityStatusReachableViaWWAN)
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self refreshAuthenticationSession];
+		});
+	}
+	else if (status == AFNetworkReachabilityStatusNotReachable)
+	{
+		[QMUITips showError:kString(@"network_error_not_reachable") inView:self.view hideAfterDelay:2.0];
+	}
+}
+
+- (void)onFailureDuringMXOperation:(NSError*)error
+{
+	self.mxCurrentOperation = nil;
+
+	if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled)
+	{
+		// Ignore this error
+		WLog(@"[MXKAuthenticationVC] flows request cancelled");
+		return;
+	}
+
+	WLog(@"[MXKAuthenticationVC] Failed to get %@ flows: %@", (_authType == MXKAuthenticationTypeLogin ? @"Login" : @"Register"), error);
+
+	// Cancel external registration parameters if any
+	_externalRegistrationParameters = nil;
+
+	// Alert user
+	NSString *title = [error.userInfo valueForKey:NSLocalizedFailureReasonErrorKey];
+	if (!title)
+	{
+		title = kString(@"error");
+	}
+	NSString *msg = [error.userInfo valueForKey:NSLocalizedDescriptionKey];
+
+	[QMUITips showError:msg inView:self.view hideAfterDelay:2.0];
+
+	// Handle specific error code here
+	if ([error.domain isEqualToString:NSURLErrorDomain])
+	{
+		// Check network reachability
+		if (error.code == NSURLErrorNotConnectedToInternet)
+		{
+			// Add reachability observer in order to launch a new request when network will be available
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onReachabilityStatusChange:) name:AFNetworkingReachabilityDidChangeNotification object:nil];
+		}
+		else if (error.code == kCFURLErrorTimedOut)
+		{
+			// Send a new request in 2 sec
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[self refreshAuthenticationSession];
+			});
+		}
+		else
+		{
+			// Remove the potential auth inputs view
+//			self.authInputsView = nil;
+		}
+	}
+	else
+	{
+		// Remove the potential auth inputs view
+//		self.authInputsView = nil;
+	}
+
+//	if (!_authInputsView)
+//	{
+//		// Display failure reason
+//		_noFlowLabel.hidden = NO;
+//		_noFlowLabel.text = [error.userInfo valueForKey:NSLocalizedDescriptionKey];
+//		if (!_noFlowLabel.text.length)
+//		{
+//			_noFlowLabel.text = [NSBundle mxk_localizedStringForKey:@"login_error_no_login_flow"];
+//		}
+//		[_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"retry"] forState:UIControlStateNormal];
+//		[_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"retry"] forState:UIControlStateNormal];
+//		_retryButton.hidden = NO;
+//	}
+}
+
+- (void)handleAuthenticationSession:(MXAuthenticationSession *)authSession
+{
+	self.mxCurrentOperation = nil;
+
+
+	// Check whether fallback is defined, and retrieve the right input view class.
+	Class authInputsViewClass;
+	if (_authType == MXKAuthenticationTypeLogin)
+	{
+//        authenticationFallback = [mxRestClient loginFallback];
+//        authInputsViewClass = loginAuthInputsViewClass;
+
+	}
+	else if (_authType == MXKAuthenticationTypeRegister)
+	{
+//        authenticationFallback = [mxRestClient registerFallback];
+//        authInputsViewClass = registerAuthInputsViewClass;
+	}
+	else
+	{
+		// Not supported for other types
+		WLog(@"[MXKAuthenticationVC] handleAuthenticationSession is ignored");
+		return;
+	}
+
+	MXKAuthInputsView *authInputsView = nil;
+
+	// Apply authentication session on inputs view
+	if ([self setAuthSession:authSession withAuthType:_authType] == NO)
+	{
+		WLog(@"[MXKAuthenticationVC] Received authentication settings are not supported");
+//            authInputsView = nil;
+	}
+	else if (!_softLogoutCredentials)
+	{
+		// If all listed flows in this authentication session are not supported we suggest using the fallback page.
+//            if (authenticationFallback.length && authInputsView.authSession.flows.count == 0)
+//            {
+//                NSLog(@"[MXKAuthenticationVC] No supported flow, suggest using fallback page");
+//                authInputsView = nil;
+//            }
+//            else if (authInputsView.authSession.flows.count != authSession.flows.count)
+//            {
+//                NSLog(@"[MXKAuthenticationVC] The authentication session contains at least one unsupported flow");
+//            }
+	}
+
+
+//    if (authInputsView)
+//    {
+	// Check whether the current view must be replaced
+//        if (self.authInputsView != authInputsView)
+//        {
+//            // Refresh layout
+//            self.authInputsView = authInputsView;
+//        }
+
+	// Refresh user interaction
+//        self.userInteractionEnabled = _userInteractionEnabled;
+
+	// Check whether an external set of parameters have been defined to pursue a registration
+//        if (self.externalRegistrationParameters)
+//        {
+//            if ([authInputsView setExternalRegistrationParameters:self.externalRegistrationParameters])
+//            {
+//                // Launch authentication now
+//                [self onButtonPressed:_submitButton];
+//            }
+//            else
+//            {
+//                [self onFailureDuringAuthRequest:[NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]];
+//
+//                _externalRegistrationParameters = nil;
+//
+//                // Restore login screen on failure
+//                self.authType = MXKAuthenticationTypeLogin;
+//            }
+//        }
+//
+//        if (_softLogoutCredentials)
+//        {
+//            [authInputsView setSoftLogoutCredentials:_softLogoutCredentials];
+//        }
+//    }
+//    else
+//    {
+//        // Remove the potential auth inputs view
+//        self.authInputsView = nil;
+//
+//        // Cancel external registration parameters if any
+//        _externalRegistrationParameters = nil;
+//
+//        // Notify user that no flow is supported
+//        if (_authType == MXKAuthenticationTypeLogin)
+//        {
+//            _noFlowLabel.text = [NSBundle mxk_localizedStringForKey:@"login_error_do_not_support_login_flows"];
+//        }
+//        else
+//        {
+//            _noFlowLabel.text = [NSBundle mxk_localizedStringForKey:@"login_error_registration_is_not_supported"];
+//        }
+//        NSLog(@"[MXKAuthenticationVC] Warning: %@", _noFlowLabel.text);
+//
+//        if (authenticationFallback.length)
+//        {
+//            [_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"login_use_fallback"] forState:UIControlStateNormal];
+//            [_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"login_use_fallback"] forState:UIControlStateNormal];
+//        }
+//        else
+//        {
+//            [_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"retry"] forState:UIControlStateNormal];
+//            [_retryButton setTitle:[NSBundle mxk_localizedStringForKey:@"retry"] forState:UIControlStateNormal];
+//        }
+//
+//        _noFlowLabel.hidden = NO;
+//        _retryButton.hidden = NO;
+//    }
+}
+
+- (void)refreshAuthenticationSession
+{
+	// Remove reachability observer
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:AFNetworkingReachabilityDidChangeNotification object:nil];
+
+	// Cancel potential request in progress
+	[self.mxCurrentOperation cancel];
+	self.mxCurrentOperation = nil;
+
+	// Reset potential authentication fallback url
+//    self.authenticationFallback = nil;
+
+	if (self.mxRestClient)
+	{
+		if (_authType == MXKAuthenticationTypeLogin)
+		{
+			self.mxCurrentOperation = [self.mxRestClient getLoginSession:^(MXAuthenticationSession* authSession) {
+
+			                                   [self handleAuthenticationSession:authSession];
+
+						   } failure:^(NSError *error) {
+
+			                                   [self onFailureDuringMXOperation:error];
+
+						   }];
+		}
+		else if (_authType == MXKAuthenticationTypeRegister)
+		{
+			self.mxCurrentOperation = [self.mxRestClient getRegisterSession:^(MXAuthenticationSession* authSession){
+
+			                                   [self handleAuthenticationSession:authSession];
+
+						   } failure:^(NSError *error){
+
+			                                   [self onFailureDuringMXOperation:error];
+
+						   }];
+		}
+		else
+		{
+			// Not supported for other types
+			WLog(@"[MXKAuthenticationVC] refreshAuthenticationSession is ignored");
+		}
+	}
+}
+
+- (void)setAuthType:(MXKAuthenticationType)authType
+{
+	if (_authType != authType)
+	{
+		_authType = authType;
+
+		// Cancel external registration parameters if any
+		_externalRegistrationParameters = nil;
+		isPasswordReseted = NO;
+	}
+
+	if (authType == MXKAuthenticationTypeLogin)
+	{
+
+		[self refreshAuthenticationSession];
+	}
+	else if (authType == MXKAuthenticationTypeRegister)
+	{
+
+		// Update supported authentication flow and associated information (defined in authentication session)
+		[self refreshAuthenticationSession];
+	}
+	else if (authType == MXKAuthenticationTypeForgotPassword)
+	{
+//		_subTitleLabel.hidden = YES;
+
+		if (isPasswordReseted)
+		{
+
+		}
+		else
+		{
+
+//			[self refreshForgotPasswordSession];
+		}
+	}
+
+	[self checkIdentityServer];
+}
+
+- (void)setIdentityServerTextFieldText:(NSString *)identityServerUrl
+{
+//    _identityServerTextField.text = identityServerUrl;
+
+	[self updateIdentityServerURL:identityServerUrl];
+}
+
+- (void)updateIdentityServerURL:(NSString*)url
+{
+	if (![self.identityService.identityServer isEqualToString:url])
+	{
+		if (url.length)
+		{
+			self.identityService = [[MXIdentityService alloc] initWithIdentityServer:url accessToken:nil andHomeserverRestClient:self.mxRestClient];
+		}
+		else
+		{
+			self.identityService = nil;
+		}
+	}
+
+	[self.mxRestClient setIdentityServer:url.length ? url : nil];
+}
+
+- (void)checkIdentityServer
+{
+	[self cancelIdentityServerCheck];
+
+	// Hide the field while checking data
+//    [self setIdentityServerHidden:YES];
+
+	NSString *homeserver = self.mxRestClient.homeserver;
+
+	// First, fetch the IS advertised by the HS
+	if (homeserver)
+	{
+		WLog(@"[MXKAuthenticationVC] checkIdentityServer for homeserver %@", homeserver);
+
+		autoDiscovery = [[MXAutoDiscovery alloc] initWithUrl:homeserver];
+
+		MXWeakify(self);
+		checkIdentityServerOperation = [autoDiscovery findClientConfig:^(MXDiscoveredClientConfig * _Nonnull discoveredClientConfig) {
+		                                        MXStrongifyAndReturnIfNil(self);
+
+		                                        NSString *identityServer = discoveredClientConfig.wellKnown.identityServer.baseUrl;
+		                                        WLog(@"[MXKAuthenticationVC] checkIdentityServer: Identity server: %@", identityServer);
+
+		                                        if (identityServer)
+							{
+								// Apply the provided IS
+								[self setIdentityServerTextFieldText:identityServer];
+							}
+
+		                                        // Then, check if the HS needs an IS for running
+		                                        MXWeakify(self);
+		                                        MXHTTPOperation *operation = [self checkIdentityServerRequirementWithCompletion:^(BOOL identityServerRequired) {
+
+		                                                                              MXStrongifyAndReturnIfNil(self);
+
+		                                                                              self->checkIdentityServerOperation = nil;
+
+		                                                                              // Show the field only if an IS is required so that the user can customise it
+//		                                                                              [self setIdentityServerHidden:!identityServerRequired];
+										      }];
+
+		                                        if (operation)
+							{
+								[self->checkIdentityServerOperation mutateTo:operation];
+							}
+		                                        else
+							{
+								self->checkIdentityServerOperation = nil;
+							}
+
+		                                        self->autoDiscovery = nil;
+
+						} failure:^(NSError *error) {
+		                                        MXStrongifyAndReturnIfNil(self);
+
+		                                        // No need to report this error to the end user
+		                                        // There will be already an error about failing to get the auth flow from the HS
+		                                        NSLog(@"[MXKAuthenticationVC] checkIdentityServer. Error: %@", error);
+
+		                                        self->autoDiscovery = nil;
+						}];
+	}
+}
+
+- (void)cancelIdentityServerCheck
+{
+	if (checkIdentityServerOperation)
+	{
+		[checkIdentityServerOperation cancel];
+		checkIdentityServerOperation = nil;
+	}
+}
+
+- (MXHTTPOperation*)checkIdentityServerRequirementWithCompletion:(void (^)(BOOL identityServerRequired))completion
+{
+	MXHTTPOperation *operation;
+
+	if (_authType == MXKAuthenticationTypeLogin)
+	{
+		// The identity server is only required for registration and password reset
+		// It is then stored in the user account data
+		completion(NO);
+	}
+	else
+	{
+		operation = [self.mxRestClient supportedMatrixVersions:^(MXMatrixVersions *matrixVersions) {
+
+		                     NSLog(@"[MXKAuthenticationVC] checkIdentityServerRequirement: %@", matrixVersions.doesServerRequireIdentityServerParam ? @"YES": @"NO");
+		                     completion(matrixVersions.doesServerRequireIdentityServerParam);
+
+			     } failure:^(NSError *error) {
+		                     // No need to report this error to the end user
+		                     // There will be already an error about failing to get the auth flow from the HS
+		                     NSLog(@"[MXKAuthenticationVC] checkIdentityServerRequirement. Error: %@", error);
+			     }];
+	}
+
+	return operation;
+}
+
+- (BOOL)displayRecaptchaForm:(void (^)(NSString *response))callback
+{
+	// Retrieve the site key
+	NSString *siteKey;
+
+	id recaptchaParams = currentSession.params[kMXLoginFlowTypeRecaptcha];
+	if (recaptchaParams && [recaptchaParams isKindOfClass:NSDictionary.class])
+	{
+		NSDictionary *recaptchaParamsDict = (NSDictionary*)recaptchaParams;
+		siteKey = recaptchaParamsDict[@"public_key"];
+	}
+
+	// Retrieve the REST client from delegate
+	MXRestClient *restClient = self.mxRestClient;
+	// Sanity check
+	if (siteKey.length && restClient && callback)
+	{
+//        [self hideInputsContainer];
+
+//        self.messageLabel.hidden = NO;
+//        self.messageLabel.text = kString(@"auth_recaptcha_message");
+
+//        self.recaptchaContainer.hidden = NO;
+//        self.currentLastContainer = self.recaptchaContainer;
+
+		// IB does not support WKWebview in a xib before iOS 11
+		// So, add it by coding
+
+		// Do some cleaning/reset before
+//        for (UIView *view in self.recaptchaContainer.subviews)
+//        {
+//            [view removeFromSuperview];
+//        }
+
+		MXKAuthenticationRecaptchaWebView *reCaptchaWebView = [MXKAuthenticationRecaptchaWebView new];
+		reCaptchaWebView.translatesAutoresizingMaskIntoConstraints = NO;
+//        [self.recaptchaContainer addSubview:reCaptchaWebView];
+
+		// Disable the webview scrollView to avoid 2 scrollviews on the same screen
+		reCaptchaWebView.scrollView.scrollEnabled = NO;
+//
+//        [self.recaptchaContainer addConstraints:
+//         [NSLayoutConstraint constraintsWithVisualFormat:@"|-[view]-|"
+//          options:0
+//          metrics:0
+//          views:@{
+//                  @"view": reCaptchaWebView
+//          }
+//         ]
+//        ];
+//        [self.recaptchaContainer addConstraints:
+//         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[view]-|"
+//          options:0
+//          metrics:0
+//          views:@{
+//                  @"view": reCaptchaWebView
+//          }
+//         ]
+//        ];
+//
+//
+//        [reCaptchaWebView openRecaptchaWidgetWithSiteKey:siteKey fromHomeServer:restClient.homeserver callback:callback];
+
+		return YES;
+	}
+
+	return NO;
+}
+
+- (BOOL)setAuthSession:(MXAuthenticationSession *)authSession withAuthType:(MXKAuthenticationType)authType
+{
+	if (authSession)
+	{
+		type = authType;
+		currentSession = authSession;
+
+		return YES;
+	}
+
+	return NO;
+}
+
+/**
+   Check if a flow (kMXLoginFlowType*) is part of the required flows steps.
+
+   @param flow the flow type to check.
+   @return YES if the the flow must be implemented.
+ */
+- (BOOL)isFlowSupported:(NSString *)flow
+{
+	for (MXLoginFlow *loginFlow in currentSession.flows)
+	{
+		if ([loginFlow.type isEqualToString:flow] || [loginFlow.stages indexOfObject:flow] != NSNotFound)
+		{
+			return YES;
+		}
+	}
+
+	return NO;
+}
+
 - (void)checkIdentityServerRequirement:(MXRestClient*)mxRestClient
         success:(void (^)(BOOL identityServerRequired))success
         failure:(void (^)(NSError *error))failure
@@ -1293,6 +2065,73 @@ const NSInteger userNameLengthLimit = 2;
 	         success(matrixVersions.doesServerRequireIdentityServerParam);
 
 	 } failure:failure];
+}
+
+
+- (BOOL)areThirdPartyIdentifiersSupported
+{
+	return ([self isFlowSupported:kMXLoginFlowTypeEmailIdentity] || [self isFlowSupported:kMXLoginFlowTypeMSISDN]);
+}
+
+- (BOOL)isThirdPartyIdentifierRequired
+{
+	// Check first whether some 3pids are supported
+	if (!self.areThirdPartyIdentifiersSupported)
+	{
+		return NO;
+	}
+
+	// Check whether an account may be created without third-party identifiers.
+	for (MXLoginFlow *loginFlow in currentSession.flows)
+	{
+		if ([loginFlow.stages indexOfObject:kMXLoginFlowTypeEmailIdentity] == NSNotFound
+		    && [loginFlow.stages indexOfObject:kMXLoginFlowTypeMSISDN] == NSNotFound)
+		{
+			// There is a flow with no 3pids
+			return NO;
+		}
+	}
+
+	return YES;
+}
+
+- (BOOL)areAllThirdPartyIdentifiersRequired
+{
+	// Check first whether some 3pids are required
+	if (!self.isThirdPartyIdentifierRequired)
+	{
+		return NO;
+	}
+
+	BOOL isEmailIdentityFlowSupported = [self isFlowSupported:kMXLoginFlowTypeEmailIdentity];
+	BOOL isMSISDNFlowSupported = [self isFlowSupported:kMXLoginFlowTypeMSISDN];
+
+	for (MXLoginFlow *loginFlow in currentSession.flows)
+	{
+		if (isEmailIdentityFlowSupported)
+		{
+			if ([loginFlow.stages indexOfObject:kMXLoginFlowTypeEmailIdentity] == NSNotFound)
+			{
+				return NO;
+			}
+			else if (isMSISDNFlowSupported)
+			{
+				if ([loginFlow.stages indexOfObject:kMXLoginFlowTypeMSISDN] == NSNotFound)
+				{
+					return NO;
+				}
+			}
+		}
+		else if (isMSISDNFlowSupported)
+		{
+			if ([loginFlow.stages indexOfObject:kMXLoginFlowTypeMSISDN] == NSNotFound)
+			{
+				return NO;
+			}
+		}
+	}
+
+	return YES;
 }
 
 #pragma mark - Lazyload
