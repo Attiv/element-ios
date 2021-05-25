@@ -44,8 +44,8 @@ NSString *const kMXLoginIdentifierTypeUser = @"m.id.user";
 NSString *const kMXLoginIdentifierTypeThirdParty = @"m.id.thirdparty";
 NSString *const kMXLoginIdentifierTypePhone = @"m.id.phone";
 
-//const NSString *defaultHomeServerUrl = @"https://matrix.org";
-const NSString *defaultHomeServerUrl = @"https://kelare.istory.cc:8448";
+const NSString *defaultHomeServerUrl = @"https://matrix.org";
+//const NSString *defaultHomeServerUrl = @"https://kelare.istory.cc:8448";
 const NSInteger loginPasswordTag = 99999;
 const NSInteger registerPasswordTag = 99998;
 const NSInteger usernameTag = 99997;
@@ -144,7 +144,7 @@ const NSInteger userNameLengthLimit = 2;
 	         make.left.mas_equalTo(mainView.mas_left).mas_offset(20);
 	 }];
 	NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
-	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", kString(@"sign_in_to_your_Matrix_account_on_matrix_client_matrix_org"), kString(@"change")] attributes:attributes];
+	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"sign_in_to_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
 	[tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
 	         WLog(@"Change Clicked");
 	 }];

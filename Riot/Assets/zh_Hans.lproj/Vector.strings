@@ -1248,6 +1248,7 @@
 "security_settings_secure_backup" = "安全备份";
 
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "在Matrix-client.Matrix.org上登录您的Matrix帐户";
+"sign_in_to_your_Matrix_account_on" = "在%1$@上登录您的Matrix帐户";
 "change" = "更改";
 "email_addresses" = "邮箱地址";
 "phone" = "电话号码";

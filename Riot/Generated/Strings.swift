@@ -814,7 +814,7 @@ internal enum VectorL10n {
   internal static var create: String { 
     return VectorL10n.tr("Vector", "create") 
   }
-  /// Erstelle Konto
+  /// Create account
   internal static var createAccount: String { 
     return VectorL10n.tr("Vector", "create_account") 
   }
@@ -6069,6 +6069,10 @@ internal enum VectorL10n {
   /// Sign in here
   internal static var signInHere: String { 
     return VectorL10n.tr("Vector", "sign_in_here") 
+  }
+  /// Sign in to your Matrix account on %1$@
+  internal static func signInToYourMatrixAccountOn(_ p1: String) -> String {
+    return VectorL10n.tr("Vector", "sign_in_to_your_Matrix_account_on", p1)
   }
   /// Sign in to your Matrix account on matrix-client.matrix.org
   internal static var signInToYourMatrixAccountOnMatrixClientMatrixOrg: String { 

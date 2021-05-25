@@ -482,6 +482,7 @@
 "e2e_room_key_request_message" = "Ósannvottaða tækið þitt '%@' er að krefjast dulritunarlykla.";
 
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org";
+"sign_in_to_your_Matrix_account_on" = "Sign in to your Matrix account on %1$@";
 "change" = "Change";
 "username" = "Username";
 "email_address" = "Email Address";

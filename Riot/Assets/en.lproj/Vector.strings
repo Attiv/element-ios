@@ -1634,6 +1634,7 @@ Tap the + to start adding people.";
 "room_intro_cell_information_multiple_dm_sentence2" = "Only you are in this conversation, unless any of you invites someone to join.";
 
 "sign_in_to_your_Matrix_account_on_matrix_client_matrix_org" = "Sign in to your Matrix account on matrix-client.matrix.org";
+"sign_in_to_your_Matrix_account_on" = "Sign in to your Matrix account on %1$@";
 "change" = "Change";
 "email_addresses" = "Email addresses";
 "phone" = "Phone";
@@ -2040,7 +2041,7 @@ Tap the + to start adding people.";
 "action_logout" = "Abmelden";
 "create_room" = "Erstelle Raum";
 "login" = "Anmelden";
-"create_account" = "Erstelle Konto";
+//"create_account" = "Erstelle Konto";
 "membership_invite" = "Eingeladen";
 "membership_leave" = "Verlassen";
 "membership_ban" = "Gesperrt";
