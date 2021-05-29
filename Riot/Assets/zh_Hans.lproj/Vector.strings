@@ -1727,3 +1727,6 @@
 "notice_display_name_removed_by_you" = "你移除了你的昵称";
 "notice_avatar_url_changed_by_you" = "你更换了头像";
 
+
+"wait_for_email_validation" = "等待邮箱认证";
+

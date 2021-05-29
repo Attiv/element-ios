@@ -2138,3 +2138,4 @@ Tap the + to start adding people.";
 "call_more_actions_dialpad" = "Ziffernblatt";
 "call_more_actions_audio_use_device" = "Lautsprecher verwenden";
 
+"wait_for_email_validation" = "Wait for email validation";

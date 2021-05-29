@@ -6430,6 +6430,10 @@ internal enum VectorL10n {
   internal static var voice: String { 
     return VectorL10n.tr("Vector", "voice") 
   }
+  /// Wait for email validation
+  internal static var waitForEmailValidation: String { 
+    return VectorL10n.tr("Vector", "wait_for_email_validation") 
+  }
   /// Warning
   internal static var warning: String { 
     return VectorL10n.tr("Vector", "warning") 
