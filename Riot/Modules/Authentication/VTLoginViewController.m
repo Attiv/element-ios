@@ -667,6 +667,7 @@ const NSInteger userNameLengthLimit = 2;
 }
 
 - (void)switchLogin {
+	[self resignResponser];
 	self.authType = MXKAuthenticationTypeLogin;
 	[self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
 	         make.top.mas_equalTo(self.loginView.mas_bottom).mas_offset(20);
@@ -681,6 +682,7 @@ const NSInteger userNameLengthLimit = 2;
 }
 
 - (void)switchRegister {
+	[self resignResponser];
 	if (nil == self.registerView) {
 		[self setupRegisterView];
 	}
@@ -742,6 +744,15 @@ const NSInteger userNameLengthLimit = 2;
 
 - (void)testUserRegistration:(void (^)(MXError *mxError))callback {
 	self.mxCurrentOperation = [self.mxRestClient testUserRegistration:self.registerUserNameInput.text callback:callback];
+}
+
+-(void)resignResponser {
+	[self.userNameInput resignFirstResponder];
+	[self.passwordInput resignFirstResponder];
+	[self.registerUserNameInput resignFirstResponder];
+	[self.registerPasswordInput resignFirstResponder];
+	[self.registerConfirmPasswordInput resignFirstResponder];
+	[self.registerEmailInput resignFirstResponder];
 }
 
 
