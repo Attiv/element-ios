@@ -75,6 +75,9 @@ const NSInteger userNameLengthLimit = 2;
 @property(nonatomic) NSDictionary *externalRegistrationParameters;
 @property(nonatomic) MXKAuthenticationType authType;
 @property(nonatomic) MXCredentials *softLogoutCredentials;
+@property (strong, nonatomic) TermsView *termsView;
+@property(nonatomic, strong) UIView *termsParentView;
+
 /**
    The current authentication session if any.
  */
@@ -510,6 +513,73 @@ const NSInteger userNameLengthLimit = 2;
 
 }
 
+
+
+- (BOOL)displayTermsView:(dispatch_block_t)onAcceptedCallback {
+	// Extract data
+	NSDictionary *loginTermsData = currentSession.params[kMXLoginFlowTypeTerms];
+	MXLoginTerms *loginTerms;
+	MXJSONModelSetMXJSONModel(loginTerms, MXLoginTerms.class, loginTermsData);
+
+	if (loginTerms)
+	{
+
+//        self.messageLabel.text = NSLocalizedStringFromTable(@"auth_accept_policies", @"Vector", nil);
+
+//        self.termsView.hidden = NO;
+		self.authView.hidden = YES;
+		if (nil != self.termsParentView) {
+			self.termsParentView.hidden = NO;
+		} else {
+			self.termsView.delegate = self;
+			UIView *termsParentView = [[UIView alloc] init];
+			[termsParentView setBackgroundColor:[UIColor whiteColor]];
+			termsParentView.layer.cornerRadius = 5;
+			termsParentView.layer.masksToBounds = YES;
+			termsParentView.layer.borderWidth = 1;
+			termsParentView.layer.borderColor = [Common fieldBorderColor].CGColor;
+			self.termsParentView = termsParentView;
+			[self.scrollView addSubview:termsParentView];
+			[termsParentView mas_makeConstraints:^(MASConstraintMaker *make) {
+			         make.top.mas_equalTo(self.logoView.mas_bottom).mas_offset(25);
+			         make.left.mas_equalTo(self.view.mas_left).mas_offset(16);
+			         make.right.mas_equalTo(self.view.mas_right).mas_offset(-16);
+			 }];
+
+			QMUILabel *tipLabel = [[QMUILabel alloc] init];
+			tipLabel.textColor = [Common text99Color];
+			tipLabel.numberOfLines = 0;
+			tipLabel.text = kString(@"auth_accept_policies");
+			[termsParentView addSubview:tipLabel];
+			[tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+			         make.top.mas_equalTo(termsParentView.mas_top).mas_offset(20);
+			         make.left.mas_equalTo(termsParentView.mas_left).mas_offset(16);
+			         make.right.mas_equalTo(termsParentView.mas_right).mas_offset(-16);
+			 }];
+
+			[termsParentView addSubview:self.termsView];
+			[self.termsView mas_makeConstraints:^(MASConstraintMaker *make) {
+			         make.top.mas_equalTo(tipLabel.mas_bottom).mas_offset(8);
+			         make.left.mas_equalTo(termsParentView.mas_left).mas_offset(16);
+			         make.right.mas_equalTo(termsParentView.mas_right).mas_offset(-16);
+			         make.height.mas_equalTo(400);
+			 }];
+
+			[termsParentView mas_updateConstraints:^(MASConstraintMaker *make) {
+			         make.bottom.mas_equalTo(self.termsView.mas_bottom).mas_offset(36);
+			 }];
+
+		}
+		[_termsParentView layoutIfNeeded];
+
+		[self.termsView displayTermsWithTerms:loginTerms onAccepted:onAcceptedCallback];
+
+		return YES;
+	}
+
+	return NO;
+}
+
 -(BOOL) setupAuthViewWithCallback:(void (^)(NSString *response))callback {
 
 	self.registerView.hidden = YES;
@@ -572,7 +642,7 @@ const NSInteger userNameLengthLimit = 2;
 		[authView addSubview:reCaptchaWebView];
 
 		// Disable the webview scrollView to avoid 2 scrollviews on the same screen
-		reCaptchaWebView.scrollView.scrollEnabled = NO;
+		reCaptchaWebView.scrollView.scrollEnabled = YES;
 
 		[authView addSubview:reCaptchaWebView];
 		[reCaptchaWebView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -976,6 +1046,16 @@ const NSInteger userNameLengthLimit = 2;
 
 - (void)prepareRegisterParameters:(void (^)(NSDictionary *parameters, NSError *error))callback {
 	if (callback) {
+		if (_externalRegistrationParameters)
+		{
+			// We trigger here a registration based on external inputs. All the required data are handled by the session id.
+			WLog(@"[AuthInputsView] prepareParameters: return external registration parameters");
+			callback(_externalRegistrationParameters, nil);
+
+			// CAUTION: Do not reset this dictionary here, it is used later to handle this registration until the end (see [updateAuthSessionWithCompletedStages:didUpdateParameters:])
+
+			return;
+		}
 		NSDictionary *parameters;
 		if (self.registerEmailInput.text.length && ![self isFlowCompleted:kMXLoginFlowTypeEmailIdentity]) {
 			WLog(@"[AuthInputsView] Prepare email identity stage");
@@ -1133,22 +1213,22 @@ const NSInteger userNameLengthLimit = 2;
 			WLog(@"[AuthInputsView] Prepare terms stage");
 
 			MXWeakify(self);
-//			[self displayTermsView:^{
-//			         MXStrongifyAndReturnIfNil(self);
-//
-//			         NSDictionary *parameters = @{
-//			                 @"auth": @{
-//			                         @"session":self->currentSession.session,
-//			                         @"type": kMXLoginFlowTypeTerms
-//					 },
-//			                 @"username": self.userLoginTextField.text,
-//			                 @"password": self.passWordTextField.text
-//				 };
-//			         callback(parameters, nil);
-//			 }];
-//
-//			// Async response
-//			return;
+			[self displayTermsView:^{
+			         MXStrongifyAndReturnIfNil(self);
+
+			         NSDictionary *parameters = @{
+			                 @"auth": @{
+			                         @"session":self->currentSession.session,
+			                         @"type": kMXLoginFlowTypeTerms
+					 },
+			                 @"username": self.registerUserNameInput.text,
+			                 @"password": self.registerPasswordInput.text
+				 };
+			         callback(parameters, nil);
+			 }];
+
+			// Async response
+			return;
 		}
 
 //		NSDictionary *parameters;
@@ -1160,7 +1240,6 @@ const NSInteger userNameLengthLimit = 2;
 //		        @"username": self.registerUserNameInput.text,
 //		        @"password": self.registerPasswordInput.text,
 //		};
-//		callback(parameters, nil);
 		callback(parameters, nil);
 	}
 }
@@ -2391,6 +2470,14 @@ const NSInteger userNameLengthLimit = 2;
 	return YES;
 }
 
+#pragma mark - MXKAuthInputsViewDelegate
+
+- (void)authInputsView:(MXKAuthInputsView *)authInputsView presentViewController:(UIViewController*)viewControllerToPresent animated:(BOOL)animated
+{
+	[self presentViewController:viewControllerToPresent animated:animated completion:nil];
+}
+
+
 #pragma mark - Lazyload
 
 - (NSString *)homeServerUrl {
@@ -2398,6 +2485,13 @@ const NSInteger userNameLengthLimit = 2;
 		_homeServerUrl = defaultHomeServerUrl;
 	}
 	return _homeServerUrl;
+}
+
+-(TermsView *)termsView {
+	if (nil == _termsView) {
+		_termsView = [[TermsView alloc] init];
+	}
+	return _termsView;
 }
 
 
