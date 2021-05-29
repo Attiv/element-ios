@@ -65,7 +65,9 @@ const NSInteger userNameLengthLimit = 2;
 @property(nonatomic, strong) QMUIButton *registerButton;
 @property(nonatomic, strong) UIView *loginView;
 @property(nonatomic, strong) UIView *registerView;
+@property(nonatomic, strong) UIView *authView;
 @property(nonatomic, strong) UIScrollView *scrollView;
+@property(nonatomic, strong) UIImageView *logoView;
 @property(nonatomic, strong) JRDropDown *languageDropDown;
 @property(nonatomic, strong) MXRestClient *mxRestClient;
 @property(nonatomic, strong) MXHTTPClientOnUnrecognizedCertificate onUnrecognizedCertificateCustomBlock;
@@ -109,6 +111,7 @@ const NSInteger userNameLengthLimit = 2;
 	         make.edges.mas_equalTo(self.view);
 	 }];
 	UIImageView *logoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"nodefy-logo"]];
+	self.logoView = logoView;
 	[scrollView addSubview:logoView];
 	[logoView mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.centerX.mas_equalTo(scrollView.mas_centerX);
@@ -507,6 +510,92 @@ const NSInteger userNameLengthLimit = 2;
 
 }
 
+-(BOOL) setupAuthViewWithCallback:(void (^)(NSString *response))callback {
+
+	self.registerView.hidden = YES;
+	// IB does not support WKWebview in a xib before iOS 11
+	// So, add it by coding
+
+	// Do some cleaning/reset before
+	if (nil != self.authView) {
+		for (UIView *v in self.authView.subviews) {
+			[v removeFromSuperview];
+		}
+	}
+	UIView *authView = [[UIView alloc] init];
+	[authView setBackgroundColor:[UIColor whiteColor]];
+	authView.layer.cornerRadius = 5;
+	authView.layer.masksToBounds = YES;
+	authView.layer.borderWidth = 1;
+	authView.layer.borderColor = [Common fieldBorderColor].CGColor;
+	self.authView = authView;
+	[self.scrollView addSubview:authView];
+	[authView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.top.mas_equalTo(self.logoView.mas_bottom).mas_offset(25);
+	         make.left.mas_equalTo(self.view.mas_left).mas_offset(16);
+	         make.right.mas_equalTo(self.view.mas_right).mas_offset(-16);
+	 }];
+
+	QMUILabel *tipLabel = [[QMUILabel alloc] init];
+	tipLabel.textColor = [Common text99Color];
+	tipLabel.numberOfLines = 0;
+	tipLabel.text = kString(@"auth_recaptcha_message");
+	[authView addSubview:tipLabel];
+	[tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.top.mas_equalTo(authView.mas_top).mas_offset(20);
+	         make.left.mas_equalTo(authView.mas_left).mas_offset(16);
+	         make.right.mas_equalTo(authView.mas_right).mas_offset(-16);
+	 }];
+
+	// Retrieve the site key
+	NSString *siteKey;
+
+	id recaptchaParams = currentSession.params[kMXLoginFlowTypeRecaptcha];
+	if (recaptchaParams && [recaptchaParams isKindOfClass:NSDictionary.class])
+	{
+		NSDictionary *recaptchaParamsDict = (NSDictionary*)recaptchaParams;
+		siteKey = recaptchaParamsDict[@"public_key"];
+	}
+
+	// Retrieve the REST client from delegate
+	MXRestClient *restClient;
+
+	restClient = [self authInputsViewThirdPartyIdValidationRestClient:self.view];
+
+	// Sanity check
+	if (siteKey.length && restClient && callback)
+	{
+
+
+		MXKAuthenticationRecaptchaWebView *reCaptchaWebView = [MXKAuthenticationRecaptchaWebView new];
+		reCaptchaWebView.translatesAutoresizingMaskIntoConstraints = NO;
+		[authView addSubview:reCaptchaWebView];
+
+		// Disable the webview scrollView to avoid 2 scrollviews on the same screen
+		reCaptchaWebView.scrollView.scrollEnabled = NO;
+
+		[authView addSubview:reCaptchaWebView];
+		[reCaptchaWebView mas_makeConstraints:^(MASConstraintMaker *make) {
+		         make.top.mas_equalTo(tipLabel.mas_bottom).mas_offset(8);
+		         make.left.mas_equalTo(authView.mas_left).mas_offset(16);
+		         make.right.mas_equalTo(authView.mas_right).mas_offset(-16);
+		         make.height.mas_equalTo(400);
+		 }];
+
+		[authView mas_updateConstraints:^(MASConstraintMaker *make) {
+		         make.bottom.mas_equalTo(reCaptchaWebView.mas_bottom).mas_offset(36);
+		 }];
+
+		[reCaptchaWebView openRecaptchaWidgetWithSiteKey:siteKey fromHomeServer:restClient.homeserver callback:callback];
+		[reCaptchaWebView.superview layoutIfNeeded];
+
+		return YES;
+	}
+
+	return NO;
+
+}
+
 - (void)switchLogin {
 	self.authType = MXKAuthenticationTypeLogin;
 	[self.languageDropDown mas_updateConstraints:^(MASConstraintMaker *make) {
@@ -692,16 +781,15 @@ const NSInteger userNameLengthLimit = 2;
 
 				if (self.externalRegistrationParameters)
 				{
-//					[self displayTermsView:^{
-//
-//					         NSDictionary *parameters = @{
-//					                 @"auth": @{
-//					                         @"session":self->currentSession.session,
-//					                         @"type": kMXLoginFlowTypeTerms
-//							 }
-//						 };
-//					         callback(parameters, nil);
-//					 }];
+					[self setupAuthViewWithCallback:^(NSString *response) {
+					         NSDictionary *parameters = @{
+					                 @"auth": @{
+					                         @"session":self->currentSession.session,
+					                         @"type": kMXLoginFlowTypeTerms
+							 }
+						 };
+					         callback(parameters, nil);
+					 }];
 				}
 				else
 				{
@@ -996,32 +1084,32 @@ const NSInteger userNameLengthLimit = 2;
 		} else if ([self isFlowSupported:kMXLoginFlowTypeRecaptcha] && ![self isFlowCompleted:kMXLoginFlowTypeRecaptcha]) {
 			WLog(@"[AuthInputsView] Prepare reCaptcha stage");
 
-//			[self displayRecaptchaForm:^(NSString *response) {
-//
-//			         if (response.length)
-//				 {
-//					 NSDictionary *parameters = @{
-//					         @"auth": @{
-//					                 @"session":currentSession.session,
-//					                 @"response": response,
-//					                 @"type": kMXLoginFlowTypeRecaptcha
-//						 },
-//					         @"username": self.userLoginTextField.text,
-//					         @"password": self.passWordTextField.text,
-//					 };
-//
-//					 callback(parameters, nil);
-//				 }
-//			         else
-//				 {
-//					 WLog(@"[AuthInputsView] reCaptcha stage failed");
-//					 callback(nil, [NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]);
-//				 }
-//
-//			 }];
-//
-//			// Async response
-//			return;
+			[self setupAuthViewWithCallback:^(NSString *response) {
+			         if (response.length)
+				 {
+					 NSDictionary *parameters = @{
+					         @"auth": @{
+					                 @"session":self->currentSession.session,
+					                 @"response": response,
+					                 @"type": kMXLoginFlowTypeRecaptcha
+						 },
+					         @"username": self.registerUserNameInput.text,
+					         @"password": self.registerPasswordInput.text,
+					 };
+
+					 callback(parameters, nil);
+				 }
+			         else
+				 {
+					 NSLog(@"[AuthInputsView] reCaptcha stage failed");
+					 callback(nil, [NSError errorWithDomain:MXKAuthErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:[NSBundle mxk_localizedStringForKey:@"not_supported_yet"]}]);
+				 }
+
+			 }];
+
+			// Async response
+			return;
+
 		} else if ([self isFlowSupported:kMXLoginFlowTypeDummy] && ![self isFlowCompleted:kMXLoginFlowTypeDummy]) {
 			parameters = @{
 			        @"auth": @{
@@ -2035,12 +2123,191 @@ const NSInteger userNameLengthLimit = 2;
 	return NO;
 }
 
-- (BOOL)setAuthSession:(MXAuthenticationSession *)authSession withAuthType:(MXKAuthenticationType)authType {
+// Tell whether a flow type is supported or not by this view.
+- (BOOL)isSupportedFlowType:(MXLoginFlowType)flowType
+{
+	if ([flowType isEqualToString:kMXLoginFlowTypePassword])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeEmailIdentity])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeRecaptcha])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeMSISDN])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeDummy])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeTerms])
+	{
+		return YES;
+	}
+	else if ([flowType isEqualToString:kMXLoginFlowTypeCAS] || [flowType isEqualToString:kMXLoginFlowTypeSSO])
+	{
+		return YES;
+	}
+
+	return NO;
+}
+
+- (MXAuthenticationSession*)validateAuthenticationSession:(MXAuthenticationSession*)authSession
+{
+	// Check whether the listed flows in this authentication session are supported
+	NSMutableArray *supportedFlows = [NSMutableArray array];
+
+	for (MXLoginFlow* flow in authSession.flows)
+	{
+		// Check whether flow type is defined
+		if (flow.type)
+		{
+			if ([self isSupportedFlowType:flow.type])
+			{
+				// Check here all stages
+				BOOL isSupported = YES;
+				if (flow.stages.count)
+				{
+					for (NSString *stage in flow.stages)
+					{
+						if ([self isSupportedFlowType:stage] == NO)
+						{
+							WLog(@"[AuthInputsView] %@: %@ stage is not supported.", (type == MXKAuthenticationTypeLogin ? @"login" : @"register"), stage);
+							isSupported = NO;
+							break;
+						}
+					}
+				}
+				else
+				{
+					flow.stages = @[flow.type];
+				}
+
+				if (isSupported)
+				{
+					[supportedFlows addObject:flow];
+				}
+			}
+			else
+			{
+				WLog(@"[AuthInputsView] %@: %@ stage is not supported.", (type == MXKAuthenticationTypeLogin ? @"login" : @"register"), flow.type);
+			}
+		}
+		else
+		{
+			// Check here all stages
+			BOOL isSupported = YES;
+			if (flow.stages.count)
+			{
+				for (NSString *stage in flow.stages)
+				{
+					if ([self isSupportedFlowType:stage] == NO)
+					{
+						WLog(@"[AuthInputsView] %@: %@ stage is not supported.", (type == MXKAuthenticationTypeLogin ? @"login" : @"register"), stage);
+						isSupported = NO;
+						break;
+					}
+				}
+			}
+
+			if (isSupported)
+			{
+				[supportedFlows addObject:flow];
+			}
+		}
+	}
+
+	if (supportedFlows.count)
+	{
+		if (supportedFlows.count == authSession.flows.count)
+		{
+			// Return the original session.
+			return authSession;
+		}
+		else
+		{
+			// Keep only the supported flow.
+			MXAuthenticationSession *updatedAuthSession = [[MXAuthenticationSession alloc] init];
+			updatedAuthSession.session = authSession.session;
+			updatedAuthSession.params = authSession.params;
+			updatedAuthSession.flows = supportedFlows;
+			return updatedAuthSession;
+		}
+	}
+
+	return nil;
+}
+
+
+- (BOOL) superSetAuthSession:(MXAuthenticationSession *)authSession withAuthType:(MXKAuthenticationType)authType {
 	if (authSession) {
 		type = authType;
 		currentSession = authSession;
 
 		return YES;
+	}
+	return NO;
+}
+
+- (BOOL)setAuthSession:(MXAuthenticationSession *)authSession withAuthType:(MXKAuthenticationType)authType {
+
+	if (type == MXKAuthenticationTypeLogin || type == MXKAuthenticationTypeRegister)
+	{
+		// Validate first the provided session
+		MXAuthenticationSession *validSession = [self validateAuthenticationSession:authSession];
+
+		// Cancel email validation if any
+		if (submittedEmail)
+		{
+			[submittedEmail cancelCurrentRequest];
+			submittedEmail = nil;
+		}
+
+		// Cancel msisdn validation if any
+		if (submittedMSISDN)
+		{
+			[submittedMSISDN cancelCurrentRequest];
+			submittedMSISDN = nil;
+		}
+
+		// Reset external registration parameters
+		_externalRegistrationParameters = nil;
+
+		// Reset UI by hidding all items
+
+
+		if ([self superSetAuthSession:validSession withAuthType:authType])
+		{
+			if (authType == MXKAuthenticationTypeLogin)
+			{
+				_isSingleSignOnRequired = NO;
+
+				if ([self isFlowSupported:kMXLoginFlowTypePassword])
+				{
+					BOOL showPhoneTextField = BuildSettings.authScreenShowPhoneNumber;
+
+				}
+				else if ([self isFlowSupported:kMXLoginFlowTypeCAS]
+				         || [self isFlowSupported:kMXLoginFlowTypeSSO])
+				{
+
+					_isSingleSignOnRequired = YES;
+				}
+			}
+			else
+			{
+				// Update the registration inputs layout by hidding third-party ids fields.
+				self.thirdPartyIdentifiersHidden = _thirdPartyIdentifiersHidden;
+			}
+
+			return YES;
+		}
 	}
 
 	return NO;
