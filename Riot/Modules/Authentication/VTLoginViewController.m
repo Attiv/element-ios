@@ -931,8 +931,9 @@ const NSInteger userNameLengthLimit = 2;
 //						   self.authInputsView.authSession.session = authSession.session;
 
 						   // Launch registration by preparing parameters dict
+						   [QMUITips showLoadingInView:self.view];
 						   [self prepareRegisterParameters:^(NSDictionary *parameters, NSError *error) {
-
+						            [QMUITips hideAllTips];
 						            if (parameters && self.mxRestClient) {
 
 								    [self registerWithParameters:parameters];
@@ -958,12 +959,13 @@ const NSInteger userNameLengthLimit = 2;
 
 - (void)registerWithParameters:(NSDictionary *)parameters {
 
+	[QMUITips showLoadingInView:self.view];
 	// Add the device name
 	NSMutableDictionary *theParameters = [NSMutableDictionary dictionaryWithDictionary:parameters];
 	theParameters[@"initial_device_display_name"] = @"Mobile";
 
 	self.mxCurrentOperation = [self.mxRestClient registerWithParameters:theParameters success:^(NSDictionary *JSONResponse) {
-
+	                                   [QMUITips hideAllTips];
 	                                   MXLoginResponse *loginResponse;
 	                                   MXJSONModelSetMXJSONModel(loginResponse, MXLoginResponse, JSONResponse);
 
@@ -984,6 +986,7 @@ const NSInteger userNameLengthLimit = 2;
 
 				   }                                                           failure:^(NSError *error) {
 
+	                                   [QMUITips hideAllTips];
 	                                   self.mxCurrentOperation = nil;
 
 	                                   // Check whether the authentication is pending (for example waiting for email validation)
