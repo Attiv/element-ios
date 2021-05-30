@@ -25,6 +25,8 @@
 #import "PrefixHeader.pch"
 #import <MatrixSDK/MatrixSDK.h>
 #import <AFNetworking/AFNetworking.h>
+#import "VTSetupSecurityBackupViewController.h"
+#import "VTBaseNavigationController.h"
 
 
 NSString *const kMXLoginFlowTypePassword = @"m.login.password";
@@ -82,6 +84,7 @@ const NSInteger newHomeServerTag = 100000;
 @property(nonatomic, strong) QMUIDialogTextFieldViewController *homeServerInputDialogController;
 @property(nonatomic, strong) YYLabel *tipLabel;
 @property(nonatomic, strong) YYLabel *registerTipLabel;
+@property (nonatomic, strong) SetPinCoordinatorBridgePresenter *setPinCoordinatorBridgePresenter;
 
 /**
    The current authentication session if any.
@@ -1323,6 +1326,19 @@ const NSInteger newHomeServerTag = 100000;
 	VTMainTabBarController *mainTabBarController = [[VTMainTabBarController alloc] init];
 	mainTabBarController.modalPresentationStyle = UIModalPresentationFullScreen;
 	[self presentViewController:mainTabBarController animated:YES completion:nil];
+//	if (!self.loginView.hidden) {
+//		VTMainTabBarController *mainTabBarController = [[VTMainTabBarController alloc] init];
+//		mainTabBarController.modalPresentationStyle = UIModalPresentationFullScreen;
+//		[self presentViewController:mainTabBarController animated:YES completion:nil];
+//	} else {
+//		MXSession *session = [[MXSession alloc] initWithMatrixRestClient:self.mxRestClient];
+//		VTSetupSecurityBackupViewController *setupSecurityBackupViewController = [[VTSetupSecurityBackupViewController alloc] init];
+//		setupSecurityBackupViewController.mainSession = session;
+//		setupSecurityBackupViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+//		[self presentViewController:setupSecurityBackupViewController animated:YES completion:^{
+//
+//		 }];
+//	}
 }
 
 - (void)didLogWithUserId:(NSString *)userId {
@@ -1346,6 +1362,30 @@ const NSInteger newHomeServerTag = 100000;
 }
 
 - (void)onSuccessfulLogin:(MXCredentials *)credentials {
+	//  Is pin protection forced?
+	if ([PinCodePreferences shared].forcePinProtection)
+	{
+		loginCredentials = credentials;
+
+		SetPinCoordinatorViewMode viewMode = SetPinCoordinatorViewModeSetPin;
+		switch (self.authType) {
+		case MXKAuthenticationTypeLogin:
+			viewMode = SetPinCoordinatorViewModeSetPinAfterLogin;
+			break;
+		case MXKAuthenticationTypeRegister:
+			viewMode = SetPinCoordinatorViewModeSetPinAfterRegister;
+			break;
+		default:
+			break;
+		}
+
+		SetPinCoordinatorBridgePresenter *presenter = [[SetPinCoordinatorBridgePresenter alloc] initWithSession:nil viewMode:viewMode];
+		presenter.delegate = self;
+		[presenter presentFrom:self animated:YES];
+		self.setPinCoordinatorBridgePresenter = presenter;
+		return;
+	}
+
 	self.mxCurrentOperation = nil;
 
 	if (self.softLogoutCredentials) {
@@ -2605,5 +2645,25 @@ const NSInteger newHomeServerTag = 100000;
 	return _homeServerInputDialogController;
 }
 
+#pragma mark - SetPinCoordinatorBridgePresenterDelegate
 
+- (void)setPinCoordinatorBridgePresenterDelegateDidComplete:(SetPinCoordinatorBridgePresenter *)coordinatorBridgePresenter
+{
+	[coordinatorBridgePresenter dismissWithAnimated:YES completion:nil];
+	self.setPinCoordinatorBridgePresenter = nil;
+
+	[self onSuccessfulLogin:loginCredentials];
+}
+
+- (void)setPinCoordinatorBridgePresenterDelegateDidCancel:(SetPinCoordinatorBridgePresenter *)coordinatorBridgePresenter
+{
+	//  enable the view again
+
+
+	//  stop the spinner
+
+	//  then, just close the enter pin screen
+	[coordinatorBridgePresenter dismissWithAnimated:YES completion:nil];
+	self.setPinCoordinatorBridgePresenter = nil;
+}
 @end

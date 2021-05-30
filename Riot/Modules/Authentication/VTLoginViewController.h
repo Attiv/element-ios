@@ -18,7 +18,6 @@
 #import "MXKAuthInputsView.h"
 #import <MXK3PID.h>
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VTLoginViewController : VTBaseViewController {
@@ -64,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 	   The timer used to postpone the registration when the authentication is pending (for example waiting for email validation)
 	 */
 	NSTimer *registrationTimer;
+	// successful login credentials
+	MXCredentials *loginCredentials;
 
 }
 /**
