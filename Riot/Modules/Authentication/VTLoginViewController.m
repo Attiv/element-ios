@@ -50,6 +50,7 @@ const NSInteger registerPasswordTag = 99998;
 const NSInteger usernameTag = 99997;
 const NSInteger registerUsernameTag = 99996;
 const NSInteger userNameLengthLimit = 2;
+const NSInteger newHomeServerTag = 100000;
 
 @interface VTLoginViewController ()
 
@@ -77,6 +78,8 @@ const NSInteger userNameLengthLimit = 2;
 @property(nonatomic) MXCredentials *softLogoutCredentials;
 @property (strong, nonatomic) TermsView *termsView;
 @property(nonatomic, strong) UIView *termsParentView;
+@property(nonatomic, strong) QMUIDialogTextFieldViewController *homeServerInputDialogController;
+@property(nonatomic, strong) YYLabel *tipLabel;
 
 /**
    The current authentication session if any.
@@ -101,6 +104,10 @@ const NSInteger userNameLengthLimit = 2;
 	[self setAuthSession:authSession withAuthType:MXKAuthenticationTypeLogin];
 	[self setupUI];
 	[self updateRESTClient];
+}
+
+-(void)showHomeServerInputDialog {
+	[self.homeServerInputDialogController show];
 }
 
 - (void)setupUI {
@@ -152,8 +159,10 @@ const NSInteger userNameLengthLimit = 2;
 	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"sign_in_to_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
 	[tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
 	         WLog(@"Change Clicked");
+	         [self showHomeServerInputDialog];
 	 }];
 	YYLabel *tipLabel = [[YYLabel alloc] init];
+	self.tipLabel = tipLabel;
 	tipLabel.attributedText = tipString;
 	tipLabel.textAlignment = NSTextAlignmentLeft;
 	tipLabel.numberOfLines = 0;
@@ -2492,6 +2501,14 @@ const NSInteger userNameLengthLimit = 2;
 }
 
 
+#pragma mark - Textfield delegate
+
+- (void)textFieldWithText:(UITextField *)textField {
+	if (textField.tag == newHomeServerTag) {
+		self.homeServerUrl = textField.text;
+	}
+}
+
 #pragma mark - Lazyload
 
 - (NSString *)homeServerUrl {
@@ -2506,6 +2523,36 @@ const NSInteger userNameLengthLimit = 2;
 		_termsView = [[TermsView alloc] init];
 	}
 	return _termsView;
+}
+
+-(QMUIDialogTextFieldViewController *)homeServerInputDialogController
+{
+	if (nil == _homeServerInputDialogController) {
+		QMUIDialogTextFieldViewController *homeServerInputDialogController = [[QMUIDialogTextFieldViewController alloc] init];
+		homeServerInputDialogController.title = kString(@"please_input_home_server");
+		[homeServerInputDialogController addTextFieldWithTitle:nil configurationHandler:^(QMUILabel *titleLabel, QMUITextField *textField, CALayer *separatorLayer) {
+		         textField.placeholder = kString(@"please_input_home_server");
+		         textField.text = self.homeServerUrl;
+		         textField.tag = newHomeServerTag;
+		         [textField addTarget:self action:@selector(textFieldWithText:) forControlEvents:UIControlEventEditingChanged];
+		 }];
+		__weak typeof(self) weakSelf = self;
+		homeServerInputDialogController.shouldManageTextFieldsReturnEventAutomatically = YES;
+		[homeServerInputDialogController addCancelButtonWithText:kString(@"cancel") block:nil];
+		[homeServerInputDialogController addSubmitButtonWithText:kString(@"confirm") block:^(QMUIDialogViewController *dialogViewController) {
+		         WLog(@"%@", weakSelf.homeServerUrl);
+		         NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
+		         NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"sign_in_to_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
+		         [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+		                  WLog(@"Change Clicked");
+		                  [self showHomeServerInputDialog];
+			  }];
+		         weakSelf.tipLabel.attributedText = tipString;
+		         [dialogViewController hide];
+		 }];
+		_homeServerInputDialogController = homeServerInputDialogController;
+	}
+	return _homeServerInputDialogController;
 }
 
 

@@ -1729,4 +1729,6 @@
 
 
 "wait_for_email_validation" = "等待邮箱认证";
-
+"please_input_home_server" = "请输入主服务器网址";
+"cancel" = "取消";
+"confirm" = "确认";

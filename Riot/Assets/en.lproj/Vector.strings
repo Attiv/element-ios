@@ -2139,3 +2139,6 @@ Tap the + to start adding people.";
 "call_more_actions_audio_use_device" = "Lautsprecher verwenden";
 
 "wait_for_email_validation" = "Wait for email validation";
+"please_input_home_server" = "Please input home server";
+"cancel" = "Cancel";
+"confirm" = "Confirm";

@@ -726,7 +726,7 @@ internal enum VectorL10n {
   internal static var cameraUnavailable: String { 
     return VectorL10n.tr("Vector", "camera_unavailable") 
   }
-  /// Abbruch
+  /// Cancel
   internal static var cancel: String { 
     return VectorL10n.tr("Vector", "cancel") 
   }
@@ -753,6 +753,10 @@ internal enum VectorL10n {
   /// collapse
   internal static var collapse: String { 
     return VectorL10n.tr("Vector", "collapse") 
+  }
+  /// Confirm
+  internal static var confirm: String { 
+    return VectorL10n.tr("Vector", "confirm") 
   }
   /// Confirm password
   internal static var confirmPassword: String { 
@@ -3545,6 +3549,10 @@ internal enum VectorL10n {
   /// PIN & %@
   internal static func pinProtectionSettingsSectionHeaderX(_ p1: String) -> String {
     return VectorL10n.tr("Vector", "pin_protection_settings_section_header_x", p1)
+  }
+  /// Please input home server
+  internal static var pleaseInputHomeServer: String { 
+    return VectorL10n.tr("Vector", "please_input_home_server") 
   }
   /// Berechtigungsstufe
   internal static var powerLevel: String { 
