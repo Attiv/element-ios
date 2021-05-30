@@ -44,6 +44,7 @@ NSString *const kMXLoginIdentifierTypeThirdParty = @"m.id.thirdparty";
 NSString *const kMXLoginIdentifierTypePhone = @"m.id.phone";
 
 const NSString *defaultHomeServerUrl = @"https://matrix.org";
+const NSString *kCustomHomeServerURLKey = @"customHomeServerURL";
 //const NSString *defaultHomeServerUrl = @"https://kelare.istory.cc:8448";
 const NSInteger loginPasswordTag = 99999;
 const NSInteger registerPasswordTag = 99998;
@@ -80,6 +81,7 @@ const NSInteger newHomeServerTag = 100000;
 @property(nonatomic, strong) UIView *termsParentView;
 @property(nonatomic, strong) QMUIDialogTextFieldViewController *homeServerInputDialogController;
 @property(nonatomic, strong) YYLabel *tipLabel;
+@property(nonatomic, strong) YYLabel *registerTipLabel;
 
 /**
    The current authentication session if any.
@@ -376,12 +378,14 @@ const NSInteger newHomeServerTag = 100000;
 	         make.left.mas_equalTo(registerView.mas_left).mas_offset(20);
 	 }];
 	NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
-	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", kString(@"create_account_on_matrix_client_matrix_org"), kString(@"change")] attributes:attributes];
+	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"create_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
 	[tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
 	         WLog(@"Change Clicked");
+	         [self showHomeServerInputDialog];
 	 }];
 	YYLabel *tipLabel = [[YYLabel alloc] init];
 	tipLabel.attributedText = tipString;
+	self.registerTipLabel = tipLabel;
 	tipLabel.textAlignment = NSTextAlignmentLeft;
 	tipLabel.numberOfLines = 0;
 	tipLabel.preferredMaxLayoutWidth = kScreenW - 60 - 20 - 16 - 16;
@@ -2023,6 +2027,54 @@ const NSInteger newHomeServerTag = 100000;
 	}
 }
 
+-(void)customHomeServerConfirmClick {
+	NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
+	NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"sign_in_to_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
+	[tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+	         WLog(@"Change Clicked");
+	         [self showHomeServerInputDialog];
+	 }];
+
+	NSDictionary *attributesRegister = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
+	NSMutableAttributedString *tipStringRegister = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"create_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributesRegister];
+	[tipStringRegister yy_setTextHighlightRange:[[tipStringRegister string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+	         WLog(@"Change Clicked");
+	         [self showHomeServerInputDialog];
+	 }];
+
+	self.tipLabel.attributedText = tipString;
+	self.registerTipLabel.attributedText = tipStringRegister;
+
+	if (self.homeServerUrl.length > 0) {
+		[[NSUserDefaults standardUserDefaults] setObject:self.homeServerUrl forKey:kCustomHomeServerURLKey];
+		[self useCustomHomeServer];
+	} else {
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:kCustomHomeServerURLKey];
+		self.homeServerUrl = defaultHomeServerUrl;
+		[self checkIdentityServer];
+	}
+	[[NSUserDefaults standardUserDefaults] synchronize];
+
+}
+
+-(void)useCustomHomeServer {
+	if (!self.mxRestClient || ![self.mxRestClient.homeserver isEqualToString:self.homeServerUrl])
+	{
+		[self updateRESTClient];
+
+		if (_authType == MXKAuthenticationTypeLogin || _authType == MXKAuthenticationTypeRegister)
+		{
+			// Restore default UI
+			self.authType = _authType;
+		}
+		else
+		{
+			// Refresh the IS anyway
+			[self checkIdentityServer];
+		}
+	}
+}
+
 - (void)setAuthType:(MXKAuthenticationType)authType {
 	if (_authType != authType) {
 		_authType = authType;
@@ -2513,7 +2565,11 @@ const NSInteger newHomeServerTag = 100000;
 
 - (NSString *)homeServerUrl {
 	if (nil == _homeServerUrl) {
-		_homeServerUrl = defaultHomeServerUrl;
+		NSMutableString *customHomeServer = [[NSUserDefaults standardUserDefaults] objectForKey:kCustomHomeServerURLKey];
+		if (nil == customHomeServer) {
+			customHomeServer = defaultHomeServerUrl;
+		}
+		_homeServerUrl = customHomeServer;
 	}
 	return _homeServerUrl;
 }
@@ -2536,18 +2592,12 @@ const NSInteger newHomeServerTag = 100000;
 		         textField.tag = newHomeServerTag;
 		         [textField addTarget:self action:@selector(textFieldWithText:) forControlEvents:UIControlEventEditingChanged];
 		 }];
-		__weak typeof(self) weakSelf = self;
+
 		homeServerInputDialogController.shouldManageTextFieldsReturnEventAutomatically = YES;
 		[homeServerInputDialogController addCancelButtonWithText:kString(@"cancel") block:nil];
 		[homeServerInputDialogController addSubmitButtonWithText:kString(@"confirm") block:^(QMUIDialogViewController *dialogViewController) {
-		         WLog(@"%@", weakSelf.homeServerUrl);
-		         NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [Common text33Color]};
-		         NSMutableAttributedString *tipString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", [NSString stringWithFormat:kString(@"sign_in_to_your_Matrix_account_on"), self.homeServerUrl], kString(@"change")] attributes:attributes];
-		         [tipString yy_setTextHighlightRange:[[tipString string] rangeOfString:kString(@"change")] color:[Common textLightBlueColor] backgroundColor:[UIColor clearColor] tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-		                  WLog(@"Change Clicked");
-		                  [self showHomeServerInputDialog];
-			  }];
-		         weakSelf.tipLabel.attributedText = tipString;
+		         WLog(@"%@", self.homeServerUrl);
+		         [self customHomeServerConfirmClick];
 		         [dialogViewController hide];
 		 }];
 		_homeServerInputDialogController = homeServerInputDialogController;

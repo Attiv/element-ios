@@ -890,6 +890,10 @@ internal enum VectorL10n {
   internal static var createRoomTypePublic: String { 
     return VectorL10n.tr("Vector", "create_room_type_public") 
   }
+  /// Create your Matrix account on %1$@
+  internal static func createYourMatrixAccountOn(_ p1: String) -> String {
+    return VectorL10n.tr("Vector", "create_your_Matrix_account_on", p1)
+  }
   /// Verify your other devices easier
   internal static var crossSigningSetupBannerSubtitle: String { 
     return VectorL10n.tr("Vector", "cross_signing_setup_banner_subtitle") 
