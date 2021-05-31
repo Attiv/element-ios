@@ -2522,7 +2522,7 @@ internal enum VectorL10n {
   internal static var loginErrorDoNotSupportLoginFlows: String { 
     return VectorL10n.tr("Vector", "login_error_do_not_support_login_flows") 
   }
-  /// Benutzername oder Passwort ungültig
+  /// Incorrect username and/or password
   internal static var loginErrorForbidden: String { 
     return VectorL10n.tr("Vector", "login_error_forbidden") 
   }
