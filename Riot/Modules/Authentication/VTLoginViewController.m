@@ -282,7 +282,7 @@ const NSInteger newHomeServerTag = 100000;
 	gradientLayer.locations = @[@0.1, @1.0];
 	gradientLayer.startPoint = CGPointMake(0, 0);
 	gradientLayer.endPoint = CGPointMake(1.0, 0);
-	gradientLayer.frame = CGRectMake(0, 0, 308, 40);
+	gradientLayer.frame = CGRectMake(0, 0, kScreenW - 80, 40);
 	gradientLayer.cornerRadius = 3;
 
 	QMUIButton *signInButton = [[QMUIButton alloc] init];
