@@ -16,9 +16,9 @@
 
 
 // App identity
-BUNDLE_DISPLAY_NAME = Element
-BASE_BUNDLE_IDENTIFIER = im.vector.app
-APPLICATION_GROUP_IDENTIFIER = group.im.vector
+BUNDLE_DISPLAY_NAME = matrix_dev
+BASE_BUNDLE_IDENTIFIER = im.matrix.app.dev
+APPLICATION_GROUP_IDENTIFIER = group.im.matrix.app.dev
 APPLICATION_SCHEME = element
 
 // Version

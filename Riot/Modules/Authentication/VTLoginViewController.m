@@ -28,7 +28,7 @@
 #import "VTSetupSecurityBackupViewController.h"
 #import "VTBaseNavigationController.h"
 
-
+const static NSString *kDefaultIdentityUrl = @"vector.im";
 NSString *const kMXLoginFlowTypePassword = @"m.login.password";
 NSString *const kMXLoginFlowTypeRecaptcha = @"m.login.recaptcha";
 NSString *const kMXLoginFlowTypeOAuth2 = @"m.login.oauth2";
@@ -1401,6 +1401,7 @@ const NSInteger newHomeServerTag = 100000;
 	} else {
 		// Report the new account in account manager
 		if (!credentials.identityServer) {
+			credentials.identityServer = kDefaultIdentityUrl;
 //			credentials.identityServer = _identityServerTextField.text;
 		}
 		MXKAccount *account = [[MXKAccount alloc] initWithCredentials:credentials];
