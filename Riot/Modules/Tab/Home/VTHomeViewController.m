@@ -22,9 +22,10 @@
 
 const static NSString * kHomeCellIdentifier = @"home_cll";
 
-@interface VTHomeViewController ()<UITableViewDataSource, UITableViewDelegate, XMPPStreamDelegate>
+@interface VTHomeViewController ()<UITableViewDataSource, UITableViewDelegate>
+
 @property (nonatomic, strong) QMUITableView *tableView;
-@property (strong, nonatomic) XMPPStream * xmppStream;
+
 @end
 
 @implementation VTHomeViewController
@@ -32,7 +33,6 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self setupUI];
-	[self configXMPP];
 	// Do any additional setup after loading the view.
 }
 
@@ -157,44 +157,6 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
 	sView.layer.borderWidth = 1;
 	sView.layer.borderColor = WRGBHex(0xEFF2F5).CGColor;
 	return sView;
-}
-
-#pragma mark - XMPP
--(void)configXMPP {
-	self.xmppStream = [[XMPPStream alloc] init];
-	[self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
-	XMPPJID *jid = [XMPPJID jidWithUser:@"vitta" domain:@"xmpp-hosting.de" resource:@"iOS"];
-	[self.xmppStream setMyJID:jid];
-
-	//连接服务器
-	NSError *error = nil;
-	[self.xmppStream connectWithTimeout:10 error:&error];
-	if (error) {
-		WLog(@"连接出错：%@",[error localizedDescription]);
-	}
-}
-
-//连接后的回调
--(void)xmppStreamDidConnect:(XMPPStream *)sender
-{
-	//连接成功后认证用户名和密码
-	NSError *error = nil;
-	[self.xmppStream authenticateWithPassword:@"123123" error:&error];
-	if (error) {
-		WLog(@"认证错误：%@",[error localizedDescription]);
-	}
-}
-
-//认证成功后的回调
--(void)xmppStreamDidAuthenticate:(XMPPStream *)sender
-{
-	WLog(@"登录成功");
-}
-
-//认证失败后的回调
--(void)xmppStream:sender didNotAuthenticate:(DDXMLElement *)error
-{
-	WLog(@"登录失败");
 }
 
 #pragma mark - lazyload

@@ -60,6 +60,8 @@
 #import "Riot-Swift.h"
 #import "PushNotificationService.h"
 
+#import "VTMainTabBarController.h"
+
 //#define MX_CALL_STACK_OPENWEBRTC
 #ifdef MX_CALL_STACK_OPENWEBRTC
 #import <MatrixOpenWebRTCWrapper/MatrixOpenWebRTCWrapper.h>
@@ -447,8 +449,10 @@ NSString *const AppDelegateUniversalLinkDidChangeNotification = @"AppDelegateUni
 
 	// Sanity check
 //    NSAssert(_masterTabBarController, @"Something wrong in Main.storyboard");
-	VTLoginViewController *loginViewController = [[VTLoginViewController alloc] init];
-	self.window.rootViewController = loginViewController;
+//	VTLoginViewController *loginViewController = [[VTLoginViewController alloc] init];
+//	self.window.rootViewController = loginViewController;
+	VTMainTabBarController *mainTabBarController = [[VTMainTabBarController alloc] init];
+	self.window.rootViewController = mainTabBarController;
 	[self.window makeKeyAndVisible];
 
 	_isAppForeground = NO;

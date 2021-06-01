@@ -2054,7 +2054,7 @@ Tap the + to start adding people.";
 "unban" = "Entsperren";
 "message_unsaved_changes" = "Es gibt nicht gespeicherte Änderungen. Verlassen wird diese verwerfen.";
 // Login Screen
-"login_error_already_logged_in" = "Bereits angemeldet";
+"login_error_already_logged_in" = "Already logged in";
 "login_error_must_start_http" = "URL muss mit http[s]:// anfangen";
 // members list Screen
 

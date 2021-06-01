@@ -2510,7 +2510,7 @@ internal enum VectorL10n {
   internal static var loginEmailPlaceholder: String { 
     return VectorL10n.tr("Vector", "login_email_placeholder") 
   }
-  /// Bereits angemeldet
+  /// Already logged in
   internal static var loginErrorAlreadyLoggedIn: String { 
     return VectorL10n.tr("Vector", "login_error_already_logged_in") 
   }

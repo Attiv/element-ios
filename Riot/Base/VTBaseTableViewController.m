@@ -14,38 +14,17 @@
 // limitations under the License.
 //
 
-#import "VTMainTabBarController.h"
-#import "VTHomeViewController.h"
-#import "PrefixHeader.pch"
-#import "VTBaseNavigationController.h"
-#import "VTXMPPViewController.h"
+#import "VTBaseTableViewController.h"
 
-@interface VTMainTabBarController ()
+@interface VTBaseTableViewController ()
 
 @end
 
-@implementation VTMainTabBarController
+@implementation VTBaseTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupUI];
     // Do any additional setup after loading the view.
-}
-
-
-- (void) setupUI {
-    VTHomeViewController *homeViewController = [[VTHomeViewController alloc] init];
-    homeViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
-
-    self.tabBar.tintColor = WRGBHex(0x29194F);
-
-    [self addChildViewController:homeViewController];
-
-    VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
-    xmppViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"XMPP" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
-
-
-    [self addChildViewController:xmppViewController];
 }
 
 /*
