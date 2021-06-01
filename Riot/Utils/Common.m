@@ -46,6 +46,10 @@
 	return WRGBHex(0xF2F0F7);
 }
 
++ (UIColor *)textBlack {
+	return WRGBHex(0x373B40);
+}
+
 +(void)initLanguage {
 	NSString *language= [self currentLanguage];
 	if (language.length>0) {

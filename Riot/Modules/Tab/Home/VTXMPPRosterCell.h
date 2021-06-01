@@ -14,34 +14,20 @@
 // limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "PrefixHeader.pch"
+
+@class QMUILabel;
+@class XMPPUserCoreDataStorageObject;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Common : NSObject
-+ (UIColor *)text66Color;
+@interface VTXMPPRosterCell : UITableViewCell
 
-+ (UIColor *)text33Color;
 
-+ (UIColor *)text99Color;
+@property (nonatomic, strong) UIImageView *avatarImageView;
+@property (nonatomic, strong) QMUILabel *nameLabel;
 
-+ (UIColor *)textLightBlueColor;
-
-+(UIColor *)fieldBorderColor;
-
-+(UIColor *)onlineColor;
-
-+(UIColor *)lightGray;
-
-+(UIColor *)textBlack;
-
-+ (void)setNewLanguage:(NSString *)language;
-
-+(void)initLanguage;
-
-+(NSString *)currentLanguage;
+-(void)setRosterWithRoster:(XMPPUserCoreDataStorageObject *)roster;
 
 @end
 

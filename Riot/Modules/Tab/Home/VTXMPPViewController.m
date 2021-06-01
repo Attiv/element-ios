@@ -18,6 +18,7 @@
 #import <CoreData/CoreData.h>
 #import "VTXMPPViewController.h"
 #import "PrefixHeader.pch"
+#import "VTXMPPRosterCell.h"
 
 
 const NSString * kCellId = @"rosterCell";
@@ -47,7 +48,8 @@ const NSString * kCellId = @"rosterCell";
 }
 
 -(void) setupUI {
-	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellId];
+	[self.tableView registerClass:[VTXMPPRosterCell class] forCellReuseIdentifier:kCellId];
+	self.tableView.tableFooterView = [[UIView alloc]init];
 }
 
 #pragma mark - XMPP
@@ -197,7 +199,7 @@ const NSString * kCellId = @"rosterCell";
 	NSArray *sectoins = [self.fetchedResultsController sections];
 	id<NSFetchedResultsSectionInfo> sectionInfo = sectoins[section];
 
-	NSLog(@"%ld", [sectionInfo numberOfObjects]);
+	WLog(@"numberOfRowsInSection %ld", [sectionInfo numberOfObjects]);
 	return [sectionInfo numberOfObjects];
 }
 
@@ -209,16 +211,16 @@ const NSString * kCellId = @"rosterCell";
 	XMPPUserCoreDataStorageObject *roster = [self.fetchedResultsController objectAtIndexPath:indexPath];
 
 //	UserInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"rosterCell" forIndexPath:indexPath];
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellId forIndexPath:indexPath];
+	VTXMPPRosterCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellId forIndexPath:indexPath];
 	//roster.jidStr
 //	[cell setCellValue:roster.nickname WithJid:@"(个性签名)"];
-
+	[cell setRosterWithRoster:roster];
 	return cell;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	return 80;
+	return 64;
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
