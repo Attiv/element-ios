@@ -14,37 +14,16 @@
 // limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "PrefixHeader.pch"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Common : NSObject
-+ (UIColor *)text66Color;
+@interface VTChatTableViewCell : UITableViewCell
 
-+ (UIColor *)text33Color;
-
-+ (UIColor *)text99Color;
-
-+ (UIColor *)textLightBlueColor;
-
-+(UIColor *)fieldBorderColor;
-
-+(UIColor *)onlineColor;
-
-+(UIColor *)lightGray;
-
-+(UIColor *)textBlack;
-
-+(UIColor *)F5Color;
-
-+ (void)setNewLanguage:(NSString *)language;
-
-+(void)initLanguage;
-
-+(NSString *)currentLanguage;
-
+@property (nonatomic, strong) QMUILabel *chatLabel;
+@property (nonatomic, strong) UIView *chatView;
+@property (nonatomic, strong) QMUILabel *timeLabel;
 @end
 
 NS_ASSUME_NONNULL_END

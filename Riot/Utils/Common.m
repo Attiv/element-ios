@@ -50,6 +50,10 @@
 	return WRGBHex(0x373B40);
 }
 
++(UIColor *)F5Color {
+    return WRGBHex(0xF5F5F5);
+}
+
 +(void)initLanguage {
 	NSString *language= [self currentLanguage];
 	if (language.length>0) {
