@@ -19,13 +19,13 @@
 #import "VTXMPPViewController.h"
 #import "PrefixHeader.pch"
 #import "VTXMPPRosterCell.h"
+#import "VTXMPPTool.h"
 
 
 const NSString * kCellId = @"rosterCell";
 
 @interface VTXMPPViewController () <UITableViewDataSource, UITableViewDelegate, XMPPStreamDelegate, NSFetchedResultsControllerDelegate>
 
-@property (strong, nonatomic) XMPPStream * xmppStream;
 @property (strong, nonatomic) NSManagedObjectContext *xmppManagedObjectContext;
 @property (strong, nonatomic) NSManagedObjectContext *xmppRosterManagedObjectContext;
 //显示在tableView上
@@ -54,62 +54,57 @@ const NSString * kCellId = @"rosterCell";
 
 #pragma mark - XMPP
 -(void)configXMPP {
-	if (nil == self.xmppStream) {
-		self.xmppStream = [[XMPPStream alloc] init];
-		[self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
-		XMPPJID *jid = [XMPPJID jidWithUser:@"vitta" domain:@"xmpp-hosting.de" resource:@"iOS"];
-		[self.xmppStream setMyJID:jid];
+	[[VTXMPPTool shareTool] startXMPP];
 
 
-		// 创建重连组件
-		XMPPReconnect *xmppReconnect = [[XMPPReconnect alloc]init];
-		[xmppReconnect activate:self.xmppStream];
-		// 创建消息保存策略
-		XMPPMessageArchivingCoreDataStorage * messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
-		// 用消息保存策略创建消息保存组件
-		XMPPMessageArchiving * xmppMessageArchiving = [[XMPPMessageArchiving alloc] initWithMessageArchivingStorage:messageStorage];
-		[xmppMessageArchiving activate:self.xmppStream];
-		// 消息保存组件上下文
-		NSManagedObjectContext *xmppManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
-		self.xmppManagedObjectContext = xmppManagedObjectContext;
+	// 创建重连组件
+	XMPPReconnect *xmppReconnect = [[XMPPReconnect alloc]init];
+	[xmppReconnect activate:[VTXMPPTool shareTool].xmppStream];
+	// 创建消息保存策略
+	XMPPMessageArchivingCoreDataStorage * messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
+	// 用消息保存策略创建消息保存组件
+	XMPPMessageArchiving * xmppMessageArchiving = [[XMPPMessageArchiving alloc] initWithMessageArchivingStorage:messageStorage];
+	[xmppMessageArchiving activate:[VTXMPPTool shareTool].xmppStream];
+	// 消息保存组件上下文
+	NSManagedObjectContext *xmppManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
+	self.xmppManagedObjectContext = xmppManagedObjectContext;
 
 
-		XMPPRosterCoreDataStorage *xmppRosterCoreDataStorage = [[XMPPRosterCoreDataStorage alloc] init];
-		XMPPRoster *xmppRoster = [[XMPPRoster alloc] initWithRosterStorage:xmppRosterCoreDataStorage];
-		[xmppRoster activate:self.xmppStream];
-		[xmppRoster addDelegate:self delegateQueue:dispatch_get_main_queue()];
-		// 用户管理上下文
-		NSManagedObjectContext* xmppRosterManagedObjectContext = xmppRosterCoreDataStorage.mainThreadManagedObjectContext;
-		self.xmppRosterManagedObjectContext = xmppRosterManagedObjectContext;
+	XMPPRosterCoreDataStorage *xmppRosterCoreDataStorage = [[XMPPRosterCoreDataStorage alloc] init];
+	XMPPRoster *xmppRoster = [[XMPPRoster alloc] initWithRosterStorage:xmppRosterCoreDataStorage];
+	[xmppRoster activate:[VTXMPPTool shareTool].xmppStream];
+	[xmppRoster addDelegate:self delegateQueue:dispatch_get_main_queue()];
+	// 用户管理上下文
+	NSManagedObjectContext* xmppRosterManagedObjectContext = xmppRosterCoreDataStorage.mainThreadManagedObjectContext;
+	self.xmppRosterManagedObjectContext = xmppRosterManagedObjectContext;
 
-		//从CoreData中获取数据
-		//通过实体获取FetchRequest实体
-		NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([XMPPUserCoreDataStorageObject class])];
-		//添加排序规则
-		NSSortDescriptor * sortD = [NSSortDescriptor sortDescriptorWithKey:@"jidStr" ascending:YES];
-		[request setSortDescriptors:@[sortD]];
-
-
-		//获取FRC
-		self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:self.xmppRosterManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
-		self.fetchedResultsController.delegate = self;
-
-		//获取内容
-
-		NSError * error;
-		if (![self.fetchedResultsController performFetch:&error]) {
-			NSLog(@"%s  %@",__FUNCTION__,[error localizedDescription]);
-		}
-
-		[self.tableView reloadData];
+	//从CoreData中获取数据
+	//通过实体获取FetchRequest实体
+	NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([XMPPUserCoreDataStorageObject class])];
+	//添加排序规则
+	NSSortDescriptor * sortD = [NSSortDescriptor sortDescriptorWithKey:@"jidStr" ascending:YES];
+	[request setSortDescriptors:@[sortD]];
 
 
-		//连接服务器
-		NSError *error2 = nil;
-		[self.xmppStream connectWithTimeout:10 error:&error2];
-		if (error2) {
-			WLog(@"连接出错：%@",[error2 localizedDescription]);
-		}
+	//获取FRC
+	self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:self.xmppRosterManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
+	self.fetchedResultsController.delegate = self;
+
+	//获取内容
+
+	NSError * error;
+	if (![self.fetchedResultsController performFetch:&error]) {
+		NSLog(@"%s  %@",__FUNCTION__,[error localizedDescription]);
+	}
+
+	[self.tableView reloadData];
+
+
+	//连接服务器
+	NSError *error2 = nil;
+	[[VTXMPPTool shareTool].xmppStream connectWithTimeout:10 error:&error2];
+	if (error2) {
+		WLog(@"连接出错：%@",[error2 localizedDescription]);
 	}
 }
 
@@ -164,28 +159,6 @@ const NSString * kCellId = @"rosterCell";
 }
 
 
-//连接后的回调
--(void)xmppStreamDidConnect:(XMPPStream *)sender
-{
-	//连接成功后认证用户名和密码
-	NSError *error = nil;
-	[self.xmppStream authenticateWithPassword:@"123123" error:&error];
-	if (error) {
-		WLog(@"认证错误：%@",[error localizedDescription]);
-	}
-}
-
-//认证成功后的回调
--(void)xmppStreamDidAuthenticate:(XMPPStream *)sender
-{
-	WLog(@"登录成功");
-}
-
-//认证失败后的回调
--(void)xmppStream:sender didNotAuthenticate:(DDXMLElement *)error
-{
-	WLog(@"登录失败");
-}
 
 #pragma mark - Table view data source
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
