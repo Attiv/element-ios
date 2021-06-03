@@ -20,6 +20,8 @@
 #import "PrefixHeader.pch"
 #import "VTXMPPRosterCell.h"
 #import "VTXMPPTool.h"
+#import "VTChatViewController.h"
+#import "VTBaseNavigationController.h"
 
 
 const NSString * kCellId = @"rosterCell";
@@ -174,6 +176,17 @@ const NSString * kCellId = @"rosterCell";
 
 	WLog(@"numberOfRowsInSection %ld", [sectionInfo numberOfObjects]);
 	return [sectionInfo numberOfObjects];
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	XMPPUserCoreDataStorageObject *roster = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	VTChatViewController *chatVC = [[VTChatViewController alloc] init];
+	VTBaseNavigationController * navigationController = [[VTBaseNavigationController alloc] initWithRootViewController:chatVC];
+	chatVC.friend = roster;
+	navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+	[self presentViewController:navigationController animated:YES completion:^{
+
+	 }];
 }
 
 

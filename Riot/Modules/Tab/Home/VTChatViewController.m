@@ -17,6 +17,9 @@
 #import "VTChatViewController.h"
 #import "VTXMPPTool.h"
 #import "PrefixHeader.pch"
+#import <UITableView+FDTemplateLayoutCell.h>
+
+const NSString *reusedCellId = @"chatCellId";
 
 @interface VTChatViewController ()<UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate, UIImagePickerControllerDelegate,NSFetchedResultsControllerDelegate,XMPPStreamDelegate>
 
@@ -42,8 +45,23 @@
 	self.title = self.friend.displayName;
 	self.tableView.delegate = self;
 	self.tableView.dataSource = self;
+	self.tableView.estimatedRowHeight = 0;
+	self.tableView.estimatedSectionFooterHeight = 0;
+	self.tableView.estimatedSectionHeaderHeight = 0;
+	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
 	[[VTXMPPTool shareTool] startXMPP];
+	[[VTXMPPTool shareTool].xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+
+	//创建消息保存策略（规则，规定）
+	XMPPMessageArchivingCoreDataStorage* messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
+	//用消息保存策略创建消息保存组件
+	XMPPMessageArchiving* xmppMessageArchiving = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:messageStorage];
+	//使组件生效
+	[xmppMessageArchiving activate:[VTXMPPTool shareTool].xmppStream];
+	//提取消息保存组件的coreData上下文
+	self.xmppManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
+
 	//通过实体获取request()
 	NSFetchRequest * request = [[NSFetchRequest alloc]initWithEntityName:NSStringFromClass([XMPPMessageArchiving_Message_CoreDataObject class])];
 	NSSortDescriptor * sortD = [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:YES];
@@ -61,7 +79,7 @@
 
 	if (![self.fetchedResultsController performFetch:&error])
 	{
-		WLog(@"%s  %@",__FUNCTION__,[error localizedDescription]);
+		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
 
 }
@@ -70,6 +88,11 @@
 -(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	return 40;
+//    return [tableView fd_heightForCellWithIdentifier:@"reuse identifer" configuration:^(id cell) {
+	// Configure this cell with data, same as what you've done in "-tableView:cellForRowAtIndexPath:"
+	// Like:
+	//    cell.entity = self.feedEntities[indexPath.row];
+//      }];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -88,7 +111,17 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	WLog(@"message = %@",message);
 
+	NSString * bodyStr = message.body;
+	NSData * bodyData = [bodyStr dataUsingEncoding:NSUTF8StringEncoding];
+	NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:bodyData options:NSJSONReadingAllowFragments error:nil];
+
+	WLog(@"dict = %@",dic);
+
+	UITableViewCell *cell;
+	return cell;
 }
 
 @end

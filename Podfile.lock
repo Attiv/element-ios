@@ -438,6 +438,7 @@ PODS:
     - KituraContracts (~> 1.2)
     - LoggerAPI (~> 1.7)
   - SwiftLint (0.43.0)
+  - "UITableView+FDTemplateLayoutCell (1.6)"
   - XMPPFramework (4.0.0):
     - XMPPFramework/default (= 4.0.0)
   - XMPPFramework/default (4.0.0):
@@ -473,6 +474,7 @@ DEPENDENCIES:
   - SwiftGen (~> 6.3)
   - SwiftJWT (~> 3.6.200)
   - SwiftLint (~> 0.43.0)
+  - "UITableView+FDTemplateLayoutCell"
   - XMPPFramework
   - YYText
   - zxcvbn-ios
@@ -519,6 +521,7 @@ SPEC REPOS:
     - SwiftGen
     - SwiftJWT
     - SwiftLint
+    - "UITableView+FDTemplateLayoutCell"
     - XMPPFramework
     - YYText
     - zxcvbn-ios
@@ -564,11 +567,12 @@ SPEC CHECKSUMS:
   SwiftGen: 67860cc7c3cfc2ed25b9b74cfd55495fc89f9108
   SwiftJWT: 88c412708f58c169d431d344c87bc79a87c830ae
   SwiftLint: 0c645fdc6feed3e390c1701ab3cc669f88b42752
+  "UITableView+FDTemplateLayoutCell": 5c949b4a5059c404b442926c0e80f81d10a2d66f
   XMPPFramework: 5d31ff9f73dce031b24bc49bcf88093627a3a86e
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
   zxcvbn-ios: fef98b7c80f1512ff0eec47ac1fa399fc00f7e3c
   ZXingObjC: fdbb269f25dd2032da343e06f10224d62f537bdb
 
-PODFILE CHECKSUM: 1579258d06d563bdde79fef64241dd0219f7d51a
+PODFILE CHECKSUM: 33488ca67a06e2e290287c90d2ee8822e653cb79
 
 COCOAPODS: 1.10.1

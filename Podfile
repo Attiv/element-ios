@@ -67,6 +67,7 @@ abstract_target 'RiotPods' do
     pod 'FLEX', :configurations => ['Debug']
     pod 'IQKeyboardManagerSwift'
     pod 'XMPPFramework'
+    pod 'UITableView+FDTemplateLayoutCell'
 
     import_MatrixKit
     pod 'DGCollectionViewLeftAlignFlowLayout', '~> 1.0.4'
