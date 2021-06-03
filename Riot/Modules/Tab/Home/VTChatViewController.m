@@ -29,8 +29,11 @@ const NSString *reusedCellId = @"chatCellId";
 //显示在tableView上
 @property(nonatomic,strong) NSFetchedResultsController *fetchedResultsController;
 
-//XMPPSteam流
-@property (strong, nonatomic) XMPPStream * xmppStream;
+@property (strong, nonatomic) QMUITableView* tableView;
+
+@property (strong, nonatomic) UIView *toolView;
+
+@property(strong, nonatomic) QMUITextField *inputField;
 @end
 
 @implementation VTChatViewController
@@ -43,6 +46,62 @@ const NSString *reusedCellId = @"chatCellId";
 
 - (void) setupUI {
 	self.title = self.friend.displayName;
+
+	QMUITableView *tableView = [[QMUITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+	[self.view addSubview:tableView];
+	self.tableView = tableView;
+	[self.view setBackgroundColor:[UIColor whiteColor]];
+	[tableView setBackgroundColor:[UIColor whiteColor]];
+
+	[tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.top.mas_equalTo(self.view.mas_top);
+	         make.left.mas_equalTo(self.view.mas_left);
+	         make.right.mas_equalTo(self.view.mas_right);
+	         make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-50);
+	 }];
+
+	UIView *toolView = [[UIView alloc] init];
+	[self.view addSubview:toolView];
+	[toolView setBackgroundColor:[Common lightGray]];
+	[toolView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.left.mas_equalTo(self.view.mas_left);
+	         make.right.mas_equalTo(self.view.mas_right);
+	         make.height.mas_equalTo(50);
+	         make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-50);
+	 }];
+
+
+	QMUIButton *sendButton = [[QMUIButton alloc] init];
+	[sendButton setTitle:@"Send" forState:UIControlStateNormal];
+	[sendButton addTarget:self action:@selector(sendButtonClicked) forControlEvents:UIControlEventTouchUpInside];
+	[toolView addSubview:sendButton];
+
+	[sendButton mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.right.mas_equalTo(toolView.mas_right).mas_offset(-16);
+	         make.centerY.mas_equalTo(toolView.mas_centerY);
+	         make.width.mas_equalTo(60);
+	         make.height.mas_equalTo(20);
+	 }];
+
+
+	QMUITextField *inputText = [[QMUITextField alloc] init];
+	[inputText setBackgroundColor:[UIColor whiteColor]];
+	inputText.textInsets = UIEdgeInsetsMake(0, 8, 0, 8);
+	inputText.layer.cornerRadius = 6;
+	inputText.layer.borderWidth = 1;
+	inputText.layer.borderColor = [Common fieldBorderColor].CGColor;
+	[inputText.layer masksToBounds];
+	self.inputField = inputText;
+	[toolView addSubview:inputText];
+	inputText.placeholder = kString(@"send_a_message");
+	[inputText mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.height.mas_equalTo(30);
+	         make.right.mas_equalTo(sendButton.mas_left).mas_offset(-8);
+	         make.centerY.mas_equalTo(toolView.mas_centerY);
+	         make.width.mas_equalTo(toolView.mas_width).mas_offset(-100);
+	 }];
+
+
 	self.tableView.delegate = self;
 	self.tableView.dataSource = self;
 	self.tableView.estimatedRowHeight = 0;
@@ -82,6 +141,33 @@ const NSString *reusedCellId = @"chatCellId";
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
 
+}
+
+-(void)sendButtonClicked {
+	XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:self.friend.jid];
+	[message addBody:self.inputField.text];
+	[[VTXMPPTool shareTool].xmppStream sendElement:message];
+}
+
+#pragma mark - XMPPStreamDelegate
+
+// 消息发送成功
+- (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message {
+
+	WLog(@"===========>消息发送成功");
+}
+
+// 消息发送失败
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error {
+
+	WLog(@"===========>消息发送失败：%@", error);
+}
+
+// 接收消息成功
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
+
+	WLog(@"===========>接收消息成功：%@", message);
+	[self.tableView reloadData];
 }
 
 #pragma mark - tableview

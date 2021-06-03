@@ -5414,6 +5414,10 @@ internal enum VectorL10n {
   internal static var send: String { 
     return VectorL10n.tr("Vector", "send") 
   }
+  /// Send a message
+  internal static var sendAMessage: String { 
+    return VectorL10n.tr("Vector", "send_a_message") 
+  }
   /// Send to %@
   internal static func sendTo(_ p1: String) -> String {
     return VectorL10n.tr("Vector", "send_to", p1)

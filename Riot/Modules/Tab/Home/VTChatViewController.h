@@ -15,11 +15,12 @@
 //
 
 #import "VTBaseTableViewController.h"
+#import "VTBaseViewController.h"
 #import <XMPPFramework/XMPPFramework.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VTChatViewController : VTBaseTableViewController
+@interface VTChatViewController : VTBaseViewController
 
 @property(nonatomic, strong) XMPPUserCoreDataStorageObject * friend;
 
