@@ -184,9 +184,6 @@ const NSString *reusedCellId = @"chatCellId";
 	WLog(@"===========>接收失败: %@", error);
 }
 
-- (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {
-    WLog(@"===========>接收消息成功：%@", presence);
-}
 
 #pragma mark - tableview
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

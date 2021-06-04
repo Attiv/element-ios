@@ -58,6 +58,9 @@
 //认证成功后的回调
 -(void)xmppStreamDidAuthenticate:(XMPPStream *)sender
 {
+	// 设置在线状态
+	XMPPPresence *pre = [XMPPPresence presence];
+	[self.xmppStream sendElement:pre];
 	WLog(@"登录成功");
 }
 
