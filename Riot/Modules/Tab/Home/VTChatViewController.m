@@ -54,12 +54,6 @@ const NSString *reusedCellId = @"chatCellId";
 	[self.view setBackgroundColor:[UIColor whiteColor]];
 	[tableView setBackgroundColor:[UIColor whiteColor]];
 
-	[tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-	         make.top.mas_equalTo(self.view.mas_top);
-	         make.left.mas_equalTo(self.view.mas_left);
-	         make.right.mas_equalTo(self.view.mas_right);
-	         make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-50);
-	 }];
 
 	UIView *toolView = [[UIView alloc] init];
 	[self.view addSubview:toolView];
@@ -68,7 +62,14 @@ const NSString *reusedCellId = @"chatCellId";
 	         make.left.mas_equalTo(self.view.mas_left);
 	         make.right.mas_equalTo(self.view.mas_right);
 	         make.height.mas_equalTo(50);
-	         make.bottom.mas_equalTo(self.view.mas_bottom).mas_offset(-50);
+	         make.bottom.mas_equalTo(self.view.mas_bottom);
+	 }];
+
+	[tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.top.mas_equalTo(self.view.mas_top);
+	         make.left.mas_equalTo(self.view.mas_left);
+	         make.right.mas_equalTo(self.view.mas_right);
+	         make.bottom.mas_equalTo(toolView.mas_top);
 	 }];
 
 
@@ -149,7 +150,7 @@ const NSString *reusedCellId = @"chatCellId";
 	{
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
-    
+
 
 }
 
