@@ -49,10 +49,11 @@
 	[self addSubview:self.chatView];
 	[self.chatView mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.left.mas_equalTo(self.mas_left).mas_offset(30);
-	         make.bottom.mas_equalTo(self.mas_bottom);
-	         make.top.mas_equalTo(self.timeLabel.mas_bottom);
+	         make.bottom.mas_equalTo(self.mas_bottom).mas_offset(-12);
+	         make.top.mas_equalTo(self.timeLabel.mas_bottom).mas_offset(12);
 	 }];
 	self.chatLabel = [[QMUILabel alloc] init];
+	self.chatLabel.contentEdgeInsets = UIEdgeInsetsMake(10, 0, 10, 0);
 	[self.chatView addSubview:self.chatLabel];
 	[self.chatLabel setFont:[UIFont systemFontOfSize:16]];
 	self.chatLabel.textColor = [Common text33Color];
@@ -65,6 +66,21 @@
 	 }];
 }
 
+-(void) fromMine {
+	[self.chatView setBackgroundColor:WRGBHex(0x95EC69)];
+	[self.chatView mas_updateConstraints:^(MASConstraintMaker *make) {
+	         make.right.mas_equalTo(self.mas_right).mas_offset(16);
+	         make.left.mas_equalTo(self.chatLabel.mas_left).mas_offset(-8);
+	 }];
+}
+
+-(void) fromFriend {
+	[self.chatView setBackgroundColor:[Common F5Color]];
+	[self.chatView mas_updateConstraints:^(MASConstraintMaker *make) {
+	         make.left.mas_equalTo(self.mas_left).mas_offset(30);
+	         make.right.mas_equalTo(self.chatLabel.mas_right).mas_offset(8);
+	 }];
+}
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 	[super setSelected:selected animated:animated];

@@ -115,12 +115,12 @@ const NSString *reusedCellId = @"chatCellId";
 	[[VTXMPPTool shareTool] startXMPP];
 	[[VTXMPPTool shareTool].xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-	[self refreshData];
+	[self initData];
 
 
 }
 
--(void)refreshData {
+-(void)initData {
 	//创建消息保存策略（规则，规定）
 	XMPPMessageArchivingCoreDataStorage* messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
 	//用消息保存策略创建消息保存组件
@@ -150,7 +150,6 @@ const NSString *reusedCellId = @"chatCellId";
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
 
-	[self.tableView reloadData];
 }
 
 -(void)sendButtonClicked {
@@ -165,7 +164,7 @@ const NSString *reusedCellId = @"chatCellId";
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message {
 
 	WLog(@"===========>消息发送成功");
-//	[self refreshData];
+
 }
 
 // 消息发送失败
@@ -209,12 +208,12 @@ const NSString *reusedCellId = @"chatCellId";
 
 - (VTChatTableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
-//	WLog(@"message = %@",message);
 
+	WLog(@"message === %@", message);
 	NSString * bodyStr = message.body;
 
 	VTChatTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reusedCellId forIndexPath:indexPath];
-
+	cell.userInteractionEnabled = NO;
 	cell.chatLabel.text = bodyStr;
 	cell.timeLabel.hidden = YES;
 	return cell;

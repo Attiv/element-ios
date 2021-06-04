@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) QMUILabel *chatLabel;
 @property (nonatomic, strong) UIView *chatView;
 @property (nonatomic, strong) QMUILabel *timeLabel;
+
+-(void)fromMine;
+-(void)fromFriend;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -44,6 +44,14 @@ const NSString * kCellId = @"rosterCell";
 	// Do any additional setup after loading the view.
 }
 
+-(void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+	[super viewDidAppear:animated];
+}
+
 - (void)didReceiveMemoryWarning {
 	[super didReceiveMemoryWarning];
 	// Dispose of any resources that can be recreated.
@@ -62,14 +70,6 @@ const NSString * kCellId = @"rosterCell";
 	// 创建重连组件
 	XMPPReconnect *xmppReconnect = [[XMPPReconnect alloc]init];
 	[xmppReconnect activate:[VTXMPPTool shareTool].xmppStream];
-	// 创建消息保存策略
-	XMPPMessageArchivingCoreDataStorage * messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
-	// 用消息保存策略创建消息保存组件
-	XMPPMessageArchiving * xmppMessageArchiving = [[XMPPMessageArchiving alloc] initWithMessageArchivingStorage:messageStorage];
-	[xmppMessageArchiving activate:[VTXMPPTool shareTool].xmppStream];
-	// 消息保存组件上下文
-	NSManagedObjectContext *xmppManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
-	self.xmppManagedObjectContext = xmppManagedObjectContext;
 
 
 	XMPPRosterCoreDataStorage *xmppRosterCoreDataStorage = [[XMPPRosterCoreDataStorage alloc] init];
