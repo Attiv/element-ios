@@ -115,6 +115,12 @@ const NSString *reusedCellId = @"chatCellId";
 	[[VTXMPPTool shareTool] startXMPP];
 	[[VTXMPPTool shareTool].xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
+	[self refreshData];
+
+
+}
+
+-(void)refreshData {
 	//创建消息保存策略（规则，规定）
 	XMPPMessageArchivingCoreDataStorage* messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
 	//用消息保存策略创建消息保存组件
@@ -144,6 +150,7 @@ const NSString *reusedCellId = @"chatCellId";
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
 
+	[self.tableView reloadData];
 }
 
 -(void)sendButtonClicked {
@@ -158,6 +165,7 @@ const NSString *reusedCellId = @"chatCellId";
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message {
 
 	WLog(@"===========>消息发送成功");
+//	[self refreshData];
 }
 
 // 消息发送失败
@@ -170,7 +178,6 @@ const NSString *reusedCellId = @"chatCellId";
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
 
 	WLog(@"===========>接收消息成功：%@", message);
-	[self.tableView reloadData];
 }
 
 #pragma mark - tableview
@@ -211,6 +218,65 @@ const NSString *reusedCellId = @"chatCellId";
 	cell.chatLabel.text = bodyStr;
 	cell.timeLabel.hidden = YES;
 	return cell;
+}
+
+#pragma mark - NSFetchedResultsController
+
+- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
+	[self.tableView beginUpdates];
+}
+
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
+        atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+
+	switch(type) {
+	case NSFetchedResultsChangeInsert:
+		[self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		break;
+
+	case NSFetchedResultsChangeDelete:
+		[self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		break;
+	}
+}
+
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
+        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
+        newIndexPath:(NSIndexPath *)newIndexPath {
+
+	UITableView *tableView = self.tableView;
+
+	switch(type) {
+
+	case NSFetchedResultsChangeInsert:
+		[tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		break;
+
+	case NSFetchedResultsChangeDelete:
+		[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		break;
+
+	case NSFetchedResultsChangeUpdate:
+		[tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+		break;
+
+	case NSFetchedResultsChangeMove:
+		[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		[tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
+		 withRowAnimation:UITableViewRowAnimationFade];
+		break;
+	}
+}
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
+	[self.tableView endUpdates];
 }
 
 @end

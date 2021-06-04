@@ -43,6 +43,9 @@
 	 }];
 	self.chatView = [[UIView alloc] init];
 	[self.chatView setBackgroundColor:[Common F5Color]];
+	self.chatView.layer.cornerRadius = 9;
+	self.chatView.layer.masksToBounds = YES;
+	self.chatView.layer.masksToBounds = YES;
 	[self addSubview:self.chatView];
 	[self.chatView mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.left.mas_equalTo(self.mas_left).mas_offset(30);
