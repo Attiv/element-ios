@@ -46,8 +46,8 @@
 	[self addSubview:self.chatView];
 	[self.chatView mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.left.mas_equalTo(self.mas_left).mas_offset(30);
-	         make.height.mas_equalTo(40);
-	         make.top.mas_equalTo(self.timeLabel.mas_bottom).mas_offset(8);
+	         make.bottom.mas_equalTo(self.mas_bottom);
+	         make.top.mas_equalTo(self.timeLabel.mas_bottom);
 	 }];
 	self.chatLabel = [[QMUILabel alloc] init];
 	[self.chatView addSubview:self.chatLabel];

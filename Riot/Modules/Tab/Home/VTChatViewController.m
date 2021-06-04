@@ -174,17 +174,16 @@ const NSString *reusedCellId = @"chatCellId";
 }
 
 #pragma mark - tableview
-//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//	return [tableView fd_heightForCellWithIdentifier:reusedCellId configuration:^(VTChatTableViewCell* cell) {
-//	                XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
-//
-//	                NSString * bodyStr = message.body;
-//
-//	                cell.chatLabel.text = bodyStr;
-//	                cell.timeLabel.hidden = YES;
-//		}];
-//}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
+
+	NSString * bodyStr = message.body;
+	return [tableView fd_heightForCellWithIdentifier:reusedCellId configuration:^(VTChatTableViewCell* cell) {
+	                cell.chatLabel.text = bodyStr;
+	                cell.timeLabel.hidden = YES;
+		}];
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
