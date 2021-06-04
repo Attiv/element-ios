@@ -19,6 +19,7 @@
 #import "PrefixHeader.pch"
 #import <UITableView+FDTemplateLayoutCell.h>
 #import "VTChatTableViewCell.h"
+#import <UIScrollView+QMUI.h>
 
 const NSString *reusedCellId = @"chatCellId";
 
@@ -151,7 +152,6 @@ const NSString *reusedCellId = @"chatCellId";
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
 
-
 }
 
 -(void)sendButtonClicked {
@@ -226,6 +226,10 @@ const NSString *reusedCellId = @"chatCellId";
 	return cell;
 }
 
+-(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tableView qmui_scrollToBottomAnimated:YES];
+}
+
 #pragma mark - NSFetchedResultsController
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
@@ -283,6 +287,7 @@ const NSString *reusedCellId = @"chatCellId";
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView endUpdates];
+	[tableView qmui_scrollToBottomAnimated:YES];
 }
 
 @end
