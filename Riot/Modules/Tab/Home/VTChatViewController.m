@@ -149,6 +149,7 @@ const NSString *reusedCellId = @"chatCellId";
 	{
 		WLog(@"chat error %s  %@",__FUNCTION__,[error localizedDescription]);
 	}
+    
 
 }
 
@@ -177,6 +178,14 @@ const NSString *reusedCellId = @"chatCellId";
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
 
 	WLog(@"===========>接收消息成功：%@", message);
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceiveError:(NSXMLElement *)error {
+	WLog(@"===========>接收失败: %@", error);
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence {
+    WLog(@"===========>接收消息成功：%@", presence);
 }
 
 #pragma mark - tableview
