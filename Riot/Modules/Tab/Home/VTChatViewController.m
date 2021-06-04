@@ -18,6 +18,7 @@
 #import "VTXMPPTool.h"
 #import "PrefixHeader.pch"
 #import <UITableView+FDTemplateLayoutCell.h>
+#import "VTChatTableViewCell.h"
 
 const NSString *reusedCellId = @"chatCellId";
 
@@ -104,10 +105,12 @@ const NSString *reusedCellId = @"chatCellId";
 
 	self.tableView.delegate = self;
 	self.tableView.dataSource = self;
+	self.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
 	self.tableView.estimatedRowHeight = 0;
 	self.tableView.estimatedSectionFooterHeight = 0;
 	self.tableView.estimatedSectionHeaderHeight = 0;
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+	[self.tableView registerClass:[VTChatTableViewCell class] forCellReuseIdentifier:reusedCellId];
 
 	[[VTXMPPTool shareTool] startXMPP];
 	[[VTXMPPTool shareTool].xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
@@ -171,15 +174,17 @@ const NSString *reusedCellId = @"chatCellId";
 }
 
 #pragma mark - tableview
--(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-	return 40;
-//    return [tableView fd_heightForCellWithIdentifier:@"reuse identifer" configuration:^(id cell) {
-	// Configure this cell with data, same as what you've done in "-tableView:cellForRowAtIndexPath:"
-	// Like:
-	//    cell.entity = self.feedEntities[indexPath.row];
-//      }];
-}
+//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//	return [tableView fd_heightForCellWithIdentifier:reusedCellId configuration:^(VTChatTableViewCell* cell) {
+//	                XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
+//
+//	                NSString * bodyStr = message.body;
+//
+//	                cell.chatLabel.text = bodyStr;
+//	                cell.timeLabel.hidden = YES;
+//		}];
+//}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -196,17 +201,16 @@ const NSString *reusedCellId = @"chatCellId";
 	return [sectionInfo numberOfObjects];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (VTChatTableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	XMPPMessageArchiving_Message_CoreDataObject * message = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	WLog(@"message = %@",message);
+//	WLog(@"message = %@",message);
 
 	NSString * bodyStr = message.body;
-	NSData * bodyData = [bodyStr dataUsingEncoding:NSUTF8StringEncoding];
-	NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:bodyData options:NSJSONReadingAllowFragments error:nil];
 
-	WLog(@"dict = %@",dic);
+	VTChatTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reusedCellId forIndexPath:indexPath];
 
-	UITableViewCell *cell;
+	cell.chatLabel.text = bodyStr;
+	cell.timeLabel.hidden = YES;
 	return cell;
 }
 
