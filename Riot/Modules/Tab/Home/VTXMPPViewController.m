@@ -160,7 +160,9 @@ const NSString * kCellId = @"rosterCell";
 	return YES;
 }
 
-
+- (void)backButtonClicked {
+	[self.navigationController popViewControllerAnimated:YES];
+}
 
 #pragma mark - Table view data source
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -181,12 +183,14 @@ const NSString * kCellId = @"rosterCell";
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	XMPPUserCoreDataStorageObject *roster = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	VTChatViewController *chatVC = [[VTChatViewController alloc] init];
-	VTBaseNavigationController * navigationController = [[VTBaseNavigationController alloc] initWithRootViewController:chatVC];
+//	VTBaseNavigationController * navigationController = [[VTBaseNavigationController alloc] initWithRootViewController:chatVC];
 	chatVC.friend = roster;
-	navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-	[self presentViewController:navigationController animated:YES completion:^{
+//	navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
 
-	 }];
+	[self.navigationController pushViewController:chatVC animated:YES];
+//	[self presentViewController:navigationController animated:YES completion:^{
+
+//	 }];
 }
 
 

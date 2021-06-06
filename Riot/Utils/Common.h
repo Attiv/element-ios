@@ -21,6 +21,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Common : NSObject
+
++ (UIColor *)themeColor;
+
 + (UIColor *)text66Color;
 
 + (UIColor *)text33Color;

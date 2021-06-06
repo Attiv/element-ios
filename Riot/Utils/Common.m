@@ -18,6 +18,10 @@
 
 @implementation Common
 
++ (UIColor *)themeColor {
+	return WRGBHex(0x29194F);
+}
+
 + (UIColor *)text66Color {
 	return WRGBHex(0x666666);
 }
@@ -51,7 +55,7 @@
 }
 
 +(UIColor *)F5Color {
-    return WRGBHex(0xF5F5F5);
+	return WRGBHex(0xF5F5F5);
 }
 
 +(void)initLanguage {

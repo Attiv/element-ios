@@ -48,6 +48,9 @@ const NSString *reusedCellId = @"chatCellId";
 
 - (void) setupUI {
 	self.title = self.friend.displayName;
+//	self.navigationController.navigationBar.backgroundColor = [Common themeColor];
+	self.navigationController.navigationBar.barTintColor = [Common themeColor];
+
 
 	QMUITableView *tableView = [[QMUITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
 	[self.view addSubview:tableView];
@@ -121,6 +124,7 @@ const NSString *reusedCellId = @"chatCellId";
 
 
 }
+
 
 -(void)initData {
 	//创建消息保存策略（规则，规定）
@@ -226,9 +230,9 @@ const NSString *reusedCellId = @"chatCellId";
 	return cell;
 }
 
--(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-	[tableView qmui_scrollToBottomAnimated:YES];
-}
+//-(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+//	[tableView qmui_scrollToBottomAnimated:YES];
+//}
 
 #pragma mark - NSFetchedResultsController
 
@@ -287,7 +291,7 @@ const NSString *reusedCellId = @"chatCellId";
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView endUpdates];
-	[tableView qmui_scrollToBottomAnimated:YES];
+	[self.tableView qmui_scrollToBottomAnimated:YES];
 }
 
 @end

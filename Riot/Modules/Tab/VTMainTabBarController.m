@@ -1,4 +1,4 @@
-// 
+//
 // Copyright 2021 New Vector Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,35 +27,35 @@
 @implementation VTMainTabBarController
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
-    [self setupUI];
-    // Do any additional setup after loading the view.
+	[super viewDidLoad];
+	[self setupUI];
+	// Do any additional setup after loading the view.
 }
 
 
 - (void) setupUI {
-    VTHomeViewController *homeViewController = [[VTHomeViewController alloc] init];
-    homeViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
+	VTHomeViewController *homeViewController = [[VTHomeViewController alloc] init];
+	homeViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
 
-    self.tabBar.tintColor = WRGBHex(0x29194F);
+	self.tabBar.tintColor = WRGBHex(0x29194F);
 
-    [self addChildViewController:homeViewController];
+	[self addChildViewController:homeViewController];
 
-    VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
-    xmppViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"XMPP" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
+	VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
+	xmppViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"XMPP" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
+	VTBaseNavigationController * xmppNaVC = [[VTBaseNavigationController alloc] initWithRootViewController:xmppViewController];
 
-
-    [self addChildViewController:xmppViewController];
+	[self addChildViewController:xmppNaVC];
 }
 
 /*
-#pragma mark - Navigation
+ #pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+   // In a storyboard-based application, you will often want to do a little preparation before navigation
+   - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
-}
-*/
+   }
+ */
 
 @end
