@@ -39,6 +39,7 @@ const NSString * kCellId = @"rosterCell";
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	[QMUITips showLoadingInView:self.view];
 	[self setupUI];
 	[self configXMPP];
 	// Do any additional setup after loading the view.
@@ -107,6 +108,7 @@ const NSString * kCellId = @"rosterCell";
 	[[VTXMPPTool shareTool].xmppStream connectWithTimeout:10 error:&error2];
 	if (error2) {
 		WLog(@"连接出错：%@",[error2 localizedDescription]);
+		[QMUITips hideAllTips];
 	}
 }
 
@@ -143,6 +145,7 @@ const NSString * kCellId = @"rosterCell";
 
 		WLog(@"aa %@",name);
 	}
+	[QMUITips hideAllTips];
 }
 
 //收到每一个好友
