@@ -19,6 +19,7 @@
 #import <XMPPFramework/XMPPUserCoreDataStorageObject.h>
 #import "VTXMPPRosterCell.h"
 #import "PrefixHeader.pch"
+#import "CDFInitialsAvatar.h"
 
 @implementation VTXMPPRosterCell
 
@@ -62,7 +63,15 @@
 }
 
 - (void)setRosterWithRoster:(XMPPUserCoreDataStorageObject *)roster {
-	self.avatarImageView.image = roster.photo;
+	UIImage *image;
+	if (nil != roster.photo) {
+		image = roster.photo;
+	} else {
+		[self.avatarImageView.superview layoutIfNeeded];
+		CDFInitialsAvatar *initialsAvatar = [[CDFInitialsAvatar alloc] initWithRect:self.avatarImageView.bounds fullName:roster.displayName];
+		image = initialsAvatar.imageRepresentation;
+	}
+	self.avatarImageView.image = image;
 	self.nameLabel.text = roster.displayName;
 }
 
