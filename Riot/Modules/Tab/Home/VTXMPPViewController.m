@@ -98,6 +98,7 @@ const NSString * kCellId = @"rosterCell";
 	NSError * error;
 	if (![self.fetchedResultsController performFetch:&error]) {
 		NSLog(@"%s  %@",__FUNCTION__,[error localizedDescription]);
+		[QMUITips hideAllTips];
 	}
 
 	[self.tableView reloadData];
@@ -189,7 +190,7 @@ const NSString * kCellId = @"rosterCell";
 //	VTBaseNavigationController * navigationController = [[VTBaseNavigationController alloc] initWithRootViewController:chatVC];
 	chatVC.friend = roster;
 //	navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-
+	chatVC.hidesBottomBarWhenPushed = YES;
 	[self.navigationController pushViewController:chatVC animated:YES];
 //	[self presentViewController:navigationController animated:YES completion:^{
 
