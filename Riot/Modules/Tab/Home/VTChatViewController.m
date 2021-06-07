@@ -159,6 +159,7 @@ const NSString *reusedCellId = @"chatCellId";
 }
 
 -(void)sendButtonClicked {
+	[self.inputField resignFirstResponder];
 	XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:self.friend.jid];
 	[message addBody:self.inputField.text];
 	[[VTXMPPTool shareTool].xmppStream sendElement:message];
@@ -170,6 +171,7 @@ const NSString *reusedCellId = @"chatCellId";
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message {
 
 	WLog(@"===========>消息发送成功");
+	self.inputField.text = @"";
 
 }
 
