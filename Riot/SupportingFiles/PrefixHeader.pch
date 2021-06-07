@@ -24,6 +24,7 @@
 #import <QMUIKit/QMUIKit.h>
 #import "Common.h"
 #import "NSBundle+language.h"
+#import <Masonry/Masonry.h>
 
 #define kScreenW [UIScreen mainScreen].bounds.size.width
 

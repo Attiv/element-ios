@@ -1734,3 +1734,7 @@
 "cancel" = "取消";
 "confirm" = "确认";
 "send_a_message" = "发送消息...";
+"dialer" = "拨号";
+"history" = "历史记录";
+"contact" = "联系人";
+"messaging" = "消息";

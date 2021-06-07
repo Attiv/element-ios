@@ -62,6 +62,7 @@ abstract_target 'RiotPods' do
   target "Riot" do
 
     pod 'Masonry'
+    pod 'JXCategoryView'
     pod 'QMUIKit'
     pod 'YYText'
     pod 'FLEX', :configurations => ['Debug']

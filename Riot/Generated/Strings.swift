@@ -762,6 +762,10 @@ internal enum VectorL10n {
   internal static var confirmPassword: String { 
     return VectorL10n.tr("Vector", "confirm_password") 
   }
+  /// Contact
+  internal static var contact: String { 
+    return VectorL10n.tr("Vector", "contact") 
+  }
   /// Lokale Kontakte
   internal static var contactLocalContacts: String { 
     return VectorL10n.tr("Vector", "contact_local_contacts") 
@@ -1374,6 +1378,10 @@ internal enum VectorL10n {
   internal static var deviceVerificationVerifyWaitPartner: String { 
     return VectorL10n.tr("Vector", "device_verification_verify_wait_partner") 
   }
+  /// Dialer
+  internal static var dialer: String { 
+    return VectorL10n.tr("Vector", "dialer") 
+  }
   /// Dial pad
   internal static var dialpadTitle: String { 
     return VectorL10n.tr("Vector", "dialpad_title") 
@@ -1873,6 +1881,10 @@ internal enum VectorL10n {
   /// Gruppen
   internal static var groupSection: String { 
     return VectorL10n.tr("Vector", "group_section") 
+  }
+  /// History
+  internal static var history: String { 
+    return VectorL10n.tr("Vector", "history") 
   }
   /// The all-in-one secure chat app for teams, friends and organisations. Tap the + button below to add people and rooms.
   internal static var homeEmptyViewInformation: String { 
@@ -2761,6 +2773,10 @@ internal enum VectorL10n {
   /// Es gibt nicht gespeicherte Änderungen. Verlassen wird diese verwerfen.
   internal static var messageUnsavedChanges: String { 
     return VectorL10n.tr("Vector", "message_unsaved_changes") 
+  }
+  /// Messaging
+  internal static var messaging: String { 
+    return VectorL10n.tr("Vector", "messaging") 
   }
   /// Anrufe benötigen Zugriff auf das Mikrofon, aber %@ hat keine Berechtigung
   internal static func microphoneAccessNotGrantedForCall(_ p1: String) -> String {

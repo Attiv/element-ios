@@ -19,6 +19,7 @@
 #import "PrefixHeader.pch"
 #import "VTBaseNavigationController.h"
 #import "VTXMPPViewController.h"
+#import "VTDialerViewController.h"
 
 @interface VTMainTabBarController ()
 
@@ -41,11 +42,11 @@
 
 	[self addChildViewController:homeViewController];
 
-	VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
-	xmppViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"XMPP" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
-	VTBaseNavigationController * xmppNaVC = [[VTBaseNavigationController alloc] initWithRootViewController:xmppViewController];
+//	VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
+	VTDialerViewController *dialerViewController = [[VTDialerViewController alloc] init];
+	dialerViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:kString(@"dialer") image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
 
-	[self addChildViewController:xmppNaVC];
+	[self addChildViewController:dialerViewController];
 }
 
 /*

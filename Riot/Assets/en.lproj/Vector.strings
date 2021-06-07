@@ -2145,3 +2145,7 @@ Tap the + to start adding people.";
 "confirm" = "Confirm";
 "create_your_Matrix_account_on" = "Create your Matrix account on %1$@";
 "send_a_message" = "Send a message";
+"dialer" = "Dialer";
+"history" = "History";
+"contact" = "Contact";
+"messaging" = "Messaging";

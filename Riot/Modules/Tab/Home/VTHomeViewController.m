@@ -37,10 +37,10 @@ const static NSString * kHomeCellIdentifier = @"home_cll";
 }
 
 -(void)setupUI {
-	self.view.backgroundColor = WRGBHex(0xF2F0F7);
+	self.view.backgroundColor = [Common lightGray];
 
 	UIView *topView = [[UIView alloc] init];
-	topView.backgroundColor = WRGBHex(0x29194F);
+	topView.backgroundColor = [Common themeColor];
 	[self.view addSubview:topView];
 	[topView mas_makeConstraints:^(MASConstraintMaker *make) {
 	         make.top.mas_equalTo(self.view.mas_top);
