@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>expansion-line</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-205.000000, -27.000000)">
+            <g id="expansion-line" transform="translate(205.000000, 27.000000)">
+                <g id="layout-2-line" transform="translate(1.000000, 1.000000)" fill="#636166" fill-rule="nonzero">
+                    <path d="M20,18.8888889 C20,19.5025386 19.5025386,20 18.8888889,20 L1.11111112,20 C0.497461393,20 0,19.5025386 0,18.8888889 L0,1.11111112 C0,0.497461393 0.497461393,0 1.11111112,0 L18.8888889,0 C19.5025386,0 20,0.497461393 20,1.11111112 L20,18.8888889 L20,18.8888889 Z M8.88888888,2.22222221 L2.22222221,2.22222221 L2.22222221,17.7777778 L8.88888888,17.7777778 L8.88888888,2.22222221 Z M17.7777778,11.1111111 L11.1111111,11.1111111 L11.1111111,17.7777778 L17.7777778,17.7777778 L17.7777778,11.1111111 Z M17.7777778,2.22222221 L11.1111111,2.22222221 L11.1111111,8.88888888 L17.7777778,8.88888888 L17.7777778,2.22222221 Z" id="Shape"></path>
+                </g>
+                <rect id="Rectangle" x="0" y="0" width="22" height="22"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

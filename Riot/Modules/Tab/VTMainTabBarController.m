@@ -36,7 +36,7 @@
 
 - (void) setupUI {
 	VTHomeViewController *homeViewController = [[VTHomeViewController alloc] init];
-	homeViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
+	homeViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:[UIImage imageNamed:@"home-line"] selectedImage:[UIImage imageNamed:@"home-5-fill"]];
 
 	self.tabBar.tintColor = WRGBHex(0x29194F);
 
@@ -44,7 +44,7 @@
 
 //	VTXMPPViewController *xmppViewController = [[VTXMPPViewController alloc] init];
 	VTDialerViewController *dialerViewController = [[VTDialerViewController alloc] init];
-	dialerViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:kString(@"dialer") image:[UIImage imageNamed:@"home"] selectedImage:[UIImage imageNamed:@"home_selected"]];
+	dialerViewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:kString(@"dialer") image:[UIImage imageNamed:@"call-24px1"] selectedImage:[UIImage imageNamed:@"call-24px"]];
 
 	[self addChildViewController:dialerViewController];
 }

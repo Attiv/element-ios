@@ -56,7 +56,7 @@
 	 }];
 
 	QMUIButton *settingButton = [[QMUIButton alloc] init];
-	[settingButton setImage:[UIImage imageNamed:@"tab_people"] forState:UIControlStateNormal];
+	[settingButton setImage:[UIImage imageNamed:@"settings-4-line"] forState:UIControlStateNormal];
 	[settingButton addTarget:self action:@selector(settingButtonClicked) forControlEvents:UIControlEventTouchUpInside];
 	[topView addSubview:settingButton];
 	[settingButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -69,7 +69,7 @@
 	[self.view layoutIfNeeded];
 	self.categoryView = [[JXCategoryTitleImageView alloc] initWithFrame:CGRectMake(0, 0, topView.w, 44)];
 	self.categoryView.titles = @[kString(@"history"), kString(@"contact"), kString(@"messaging")];
-	self.categoryView.imageNames = @[@"tab_people", @"tab_people", @"tab_people"];
+	self.categoryView.imageNames = @[@"history", @"contact-16px", @"info-16px"];
 	self.categoryView.titleColor = [UIColor lightGrayColor];
 	self.categoryView.titleImageSpacing = 7;
 	self.categoryView.titleSelectedColor = [UIColor whiteColor];

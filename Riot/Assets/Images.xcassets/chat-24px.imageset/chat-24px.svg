@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>chat-24px</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-200.000000, -137.000000)">
+            <g id="chat-24px" transform="translate(200.000000, 137.000000)">
+                <polygon id="Path" points="0 0 20 0 20 20 0 20"></polygon>
+                <path d="M16.6666667,1.66666667 L3.33333333,1.66666667 C2.41666667,1.66666667 1.675,2.41666667 1.675,3.33333333 L1.66666667,18.3333333 L5,15 L16.6666667,15 C17.5833333,15 18.3333333,14.25 18.3333333,13.3333333 L18.3333333,3.33333333 C18.3333333,2.41666667 17.5833333,1.66666667 16.6666667,1.66666667 Z M5,7.5 L15,7.5 L15,9.16666667 L5,9.16666667 L5,7.5 Z M11.6666667,11.6666667 L5,11.6666667 L5,10 L11.6666667,10 L11.6666667,11.6666667 Z M15,6.66666667 L5,6.66666667 L5,5 L15,5 L15,6.66666667 Z" id="Shape" fill="#383F45" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

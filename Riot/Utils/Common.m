@@ -58,6 +58,14 @@
 	return WRGBHex(0xF5F5F5);
 }
 
++(UIColor *)tabBarUnSelectColor {
+	return WRGBHex(0x636166);
+}
+
++(UIColor *)tabBarSelectColor {
+	return WRGBHex(0x29194F);
+}
+
 +(void)initLanguage {
 	NSString *language= [self currentLanguage];
 	if (language.length>0) {

@@ -42,6 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 +(UIColor *)F5Color;
 
++(UIColor *)tabBarUnSelectColor;
+
++(UIColor *)tabBarSelectColor;
+
 + (void)setNewLanguage:(NSString *)language;
 
 +(void)initLanguage;

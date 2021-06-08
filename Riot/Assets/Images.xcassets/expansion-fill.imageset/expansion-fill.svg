@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>expansion-fill</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-205.000000, -59.000000)">
+            <g id="expansion-fill" transform="translate(205.000000, 59.000000)">
+                <g id="auto_awesome_mosaic_black_24dp" transform="translate(1.000000, 1.000000)" fill="#29194F" fill-rule="nonzero">
+                    <path d="M0,2.22222222 L0,17.7777778 C0,19 0.988888889,20 2.22222222,20 L8.88888889,20 L8.88888889,0 L2.22222222,0 C0.988888889,0 0,1 0,2.22222222 Z M17.7777778,0 L11.1111111,0 L11.1111111,8.88888889 L20,8.88888889 L20,2.22222222 C20,1 19,0 17.7777778,0 Z M11.1111111,20 L17.7777778,20 C19,20 20,19 20,17.7777778 L20,11.1111111 L11.1111111,11.1111111 L11.1111111,20 Z" id="Shape"></path>
+                </g>
+                <rect id="Rectangle" x="0" y="0" width="22" height="22"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
