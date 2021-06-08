@@ -15,11 +15,13 @@
 //
 
 #import "VTDialerViewController.h"
+#import "VTXMPPViewController.h"
 #import "PrefixHeader.pch"
 
-@interface VTDialerViewController ()
+@interface VTDialerViewController () <JXCategoryListContainerViewDelegate>
 
 @property(nonatomic, strong) JXCategoryTitleImageView *categoryView;
+@property(nonatomic, strong) JXCategoryListContainerView *listContainerView;
 
 @end
 
@@ -90,10 +92,47 @@
 	 }];
 	[topView.superview layoutIfNeeded];
 
+	self.listContainerView = [[JXCategoryListContainerView alloc] initWithType:JXCategoryListContainerType_ScrollView delegate:self];
+	[self.view addSubview:self.listContainerView];
+	// 关联到 categoryView
+	self.categoryView.listContainer = self.listContainerView;
+	[self.listContainerView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.top.mas_equalTo(topView.mas_bottom);
+	         make.left.mas_equalTo(self.view.mas_left);
+	         make.right.mas_equalTo(self.view.mas_right);
+	         make.bottom.mas_equalTo(self.view.mas_bottom);
+	 }];
+	[self.listContainerView.superview layoutIfNeeded];
+
+
+
 }
 
 -(void)settingButtonClicked {
 
+}
+
+# pragma mark - JXCategoryListContainerViewDelegate
+// 返回列表的数量
+- (NSInteger)numberOfListsInlistContainerView:(JXCategoryListContainerView *)listContainerView {
+	return self.categoryView.titles.count;
+}
+// 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
+- (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
+	switch (index) {
+	case 0:
+		return nil;
+		break;
+	case 1:
+		return nil;
+		break;
+	case 2:
+		return [[VTXMPPViewController alloc] init];
+		break;
+	default:
+		return nil;
+		break;
+	}
 }
 
 /*

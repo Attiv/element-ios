@@ -22,11 +22,13 @@
 #import "VTXMPPTool.h"
 #import "VTChatViewController.h"
 #import "VTBaseNavigationController.h"
-
+#import <JXCategoryListContainerView.h>
 
 const NSString * kCellId = @"rosterCell";
 
-@interface VTXMPPViewController () <UITableViewDataSource, UITableViewDelegate, XMPPStreamDelegate, NSFetchedResultsControllerDelegate>
+@interface VTXMPPViewController () <UITableViewDataSource, UITableViewDelegate, XMPPStreamDelegate, NSFetchedResultsControllerDelegate, JXCategoryListContentViewDelegate>
+
+@property (strong, nonatomic) QMUITableView *tableView;
 
 @property (strong, nonatomic) NSManagedObjectContext *xmppManagedObjectContext;
 @property (strong, nonatomic) NSManagedObjectContext *xmppRosterManagedObjectContext;
@@ -59,8 +61,20 @@ const NSString * kCellId = @"rosterCell";
 }
 
 -(void) setupUI {
+	[self.view setBackgroundColor:[UIColor whiteColor]];
+	self.tableView = [[QMUITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.w, self.view.h) style:UITableViewStylePlain];
+	self.tableView.delegate = self;
+	self.tableView.dataSource = self;
 	[self.tableView registerClass:[VTXMPPRosterCell class] forCellReuseIdentifier:kCellId];
 	self.tableView.tableFooterView = [[UIView alloc]init];
+	[self.view addSubview:self.tableView];
+	[self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+	         make.left.mas_equalTo(self.view.mas_left);
+	         make.right.mas_equalTo(self.view.mas_right);
+	         make.top.mas_equalTo(self.view.mas_top);
+	         make.bottom.mas_equalTo(self.view.mas_bottom);
+	 }];
+	[self.tableView layoutIfNeeded];
 }
 
 #pragma mark - XMPP
@@ -272,6 +286,13 @@ const NSString * kCellId = @"rosterCell";
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView endUpdates];
+}
+
+
+#pragma mark - JXCategoryListContentViewDelegate
+
+-(UIView *)listView {
+	return self.view;
 }
 
 @end
