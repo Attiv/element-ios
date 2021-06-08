@@ -18,6 +18,7 @@
 
 @implementation VTChatTableViewCell
 
+
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
@@ -67,19 +68,38 @@
 }
 
 -(void) fromMine {
+	[self.chatLabel sizeToFit];
+	[self layoutIfNeeded];
+	[self.chatLabel.superview layoutIfNeeded];
 	[self.chatView setBackgroundColor:WRGBHex(0x95EC69)];
-	[self.chatView mas_updateConstraints:^(MASConstraintMaker *make) {
-	         make.right.mas_equalTo(self.mas_right).mas_offset(16);
-	         make.left.mas_equalTo(self.chatLabel.mas_left).mas_offset(-8);
+	[self.chatView mas_remakeConstraints:^(MASConstraintMaker *make) {
+	         make.right.mas_equalTo(self.mas_right).mas_offset(-16);
+	         make.bottom.mas_equalTo(self.mas_bottom).mas_offset(-12);
+	         make.top.mas_equalTo(self.timeLabel.mas_bottom).mas_offset(12);
+	         make.width.mas_equalTo(self.chatLabel.w + 16);
 	 }];
+	[self.chatView.superview layoutIfNeeded];
+
+//	[self.chatLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+//	         make.right.mas_equalTo(self.chatView.mas_right).mas_offset(-8);
+//	 }];
 }
 
 -(void) fromFriend {
+	[self.chatLabel sizeToFit];
+	[self layoutIfNeeded];
+	[self.chatLabel.superview layoutIfNeeded];
 	[self.chatView setBackgroundColor:[Common F5Color]];
-	[self.chatView mas_updateConstraints:^(MASConstraintMaker *make) {
+	[self.chatView mas_remakeConstraints:^(MASConstraintMaker *make) {
 	         make.left.mas_equalTo(self.mas_left).mas_offset(30);
-	         make.right.mas_equalTo(self.chatLabel.mas_right).mas_offset(8);
+	         make.bottom.mas_equalTo(self.mas_bottom).mas_offset(-12);
+	         make.top.mas_equalTo(self.timeLabel.mas_bottom).mas_offset(12);
+	         make.width.mas_equalTo(self.chatLabel.w + 16);
 	 }];
+	[self.chatView.superview layoutIfNeeded];
+//	[self.chatLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+//	         make.left.mas_equalTo(self.chatView.mas_left).mas_offset((8));
+//	 }];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

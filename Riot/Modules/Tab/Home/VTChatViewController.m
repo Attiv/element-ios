@@ -221,6 +221,11 @@ const NSString *reusedCellId = @"chatCellId";
 	cell.userInteractionEnabled = NO;
 	cell.chatLabel.text = bodyStr;
 	cell.timeLabel.hidden = YES;
+	if ([[NSString stringWithFormat:@"%@", message.outgoing] isEqualToString: @"1"]) {
+		[cell fromMine];
+	} else {
+		[cell fromFriend];
+	}
 	return cell;
 }
 
