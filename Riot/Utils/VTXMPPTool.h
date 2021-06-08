@@ -26,7 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)startXMPP;
 
 @property (strong, nonatomic) XMPPStream * xmppStream;
-
+@property (strong, nonatomic) XMPPRoster *xmppRoster;
+@property (strong, nonatomic) NSManagedObjectContext* xmppRosterManagedObjectContext;
+//从数据库中获取发送内容的xmppManagedObjectContext
+@property (strong, nonatomic) NSManagedObjectContext* xmppMessageManagedObjectContext;
 @end
 
 NS_ASSUME_NONNULL_END

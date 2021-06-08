@@ -25,8 +25,7 @@ const NSString *reusedCellId = @"chatCellId";
 
 @interface VTChatViewController ()<UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate, UIImagePickerControllerDelegate,NSFetchedResultsControllerDelegate,XMPPStreamDelegate>
 
-//从数据库中获取发送内容的xmppManagedObjectContext
-@property(nonatomic,strong) NSManagedObjectContext *xmppManagedObjectContext;
+
 
 //显示在tableView上
 @property(nonatomic,strong) NSFetchedResultsController *fetchedResultsController;
@@ -117,7 +116,7 @@ const NSString *reusedCellId = @"chatCellId";
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 	[self.tableView registerClass:[VTChatTableViewCell class] forCellReuseIdentifier:reusedCellId];
 
-	[[VTXMPPTool shareTool] startXMPP];
+//	[[VTXMPPTool shareTool] startXMPP];
 	[[VTXMPPTool shareTool].xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
 	[self initData];
@@ -127,14 +126,7 @@ const NSString *reusedCellId = @"chatCellId";
 
 
 -(void)initData {
-	//创建消息保存策略（规则，规定）
-	XMPPMessageArchivingCoreDataStorage* messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
-	//用消息保存策略创建消息保存组件
-	XMPPMessageArchiving* xmppMessageArchiving = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:messageStorage];
-	//使组件生效
-	[xmppMessageArchiving activate:[VTXMPPTool shareTool].xmppStream];
-	//提取消息保存组件的coreData上下文
-	self.xmppManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
+
 
 	//通过实体获取request()
 	NSFetchRequest * request = [[NSFetchRequest alloc]initWithEntityName:NSStringFromClass([XMPPMessageArchiving_Message_CoreDataObject class])];
@@ -145,7 +137,7 @@ const NSString *reusedCellId = @"chatCellId";
 	[request setPredicate:predicate];
 
 
-	self.fetchedResultsController = [[NSFetchedResultsController alloc]initWithFetchRequest:request managedObjectContext:self.xmppManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
+	self.fetchedResultsController = [[NSFetchedResultsController alloc]initWithFetchRequest:request managedObjectContext:[VTXMPPTool shareTool].xmppMessageManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
 
 	self.fetchedResultsController.delegate = self;
 

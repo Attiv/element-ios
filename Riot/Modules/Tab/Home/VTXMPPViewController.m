@@ -30,8 +30,6 @@ const NSString * kCellId = @"rosterCell";
 
 @property (strong, nonatomic) QMUITableView *tableView;
 
-@property (strong, nonatomic) NSManagedObjectContext *xmppManagedObjectContext;
-@property (strong, nonatomic) NSManagedObjectContext *xmppRosterManagedObjectContext;
 //显示在tableView上
 @property(nonatomic,strong) NSFetchedResultsController *fetchedResultsController;
 
@@ -41,7 +39,7 @@ const NSString * kCellId = @"rosterCell";
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	[QMUITips showLoadingInView:self.view];
+	[QMUITips showLoadingInView: kKeyWindow];
 	[self setupUI];
 	[self configXMPP];
 	// Do any additional setup after loading the view.
@@ -81,19 +79,7 @@ const NSString * kCellId = @"rosterCell";
 -(void)configXMPP {
 	[[VTXMPPTool shareTool] startXMPP];
 
-
-	// 创建重连组件
-	XMPPReconnect *xmppReconnect = [[XMPPReconnect alloc]init];
-	[xmppReconnect activate:[VTXMPPTool shareTool].xmppStream];
-
-
-	XMPPRosterCoreDataStorage *xmppRosterCoreDataStorage = [[XMPPRosterCoreDataStorage alloc] init];
-	XMPPRoster *xmppRoster = [[XMPPRoster alloc] initWithRosterStorage:xmppRosterCoreDataStorage];
-	[xmppRoster activate:[VTXMPPTool shareTool].xmppStream];
-	[xmppRoster addDelegate:self delegateQueue:dispatch_get_main_queue()];
-	// 用户管理上下文
-	NSManagedObjectContext* xmppRosterManagedObjectContext = xmppRosterCoreDataStorage.mainThreadManagedObjectContext;
-	self.xmppRosterManagedObjectContext = xmppRosterManagedObjectContext;
+	[[VTXMPPTool shareTool].xmppRoster addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
 	//从CoreData中获取数据
 	//通过实体获取FetchRequest实体
@@ -104,7 +90,7 @@ const NSString * kCellId = @"rosterCell";
 
 
 	//获取FRC
-	self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:self.xmppRosterManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
+	self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:[VTXMPPTool shareTool].xmppRosterManagedObjectContext sectionNameKeyPath:nil cacheName:nil];
 	self.fetchedResultsController.delegate = self;
 
 	//获取内容
@@ -118,13 +104,7 @@ const NSString * kCellId = @"rosterCell";
 	[self.tableView reloadData];
 
 
-	//连接服务器
-	NSError *error2 = nil;
-	[[VTXMPPTool shareTool].xmppStream connectWithTimeout:10 error:&error2];
-	if (error2) {
-		WLog(@"连接出错：%@",[error2 localizedDescription]);
-		[QMUITips hideAllTips];
-	}
+
 }
 
 
@@ -147,7 +127,7 @@ const NSString * kCellId = @"rosterCell";
 	WLog(@"xmppRosterDidEndPopulating");
 	NSError * error;
 	NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([XMPPUserCoreDataStorageObject class])];
-	NSArray *friends = [self.xmppRosterManagedObjectContext executeFetchRequest:request error:&error];
+	NSArray *friends = [[VTXMPPTool shareTool].xmppRosterManagedObjectContext executeFetchRequest:request error:&error];
 	for (XMPPUserCoreDataStorageObject *object in friends) {
 
 		NSString *name = [object displayName];
@@ -201,14 +181,12 @@ const NSString * kCellId = @"rosterCell";
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	XMPPUserCoreDataStorageObject *roster = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	VTChatViewController *chatVC = [[VTChatViewController alloc] init];
-//	VTBaseNavigationController * navigationController = [[VTBaseNavigationController alloc] initWithRootViewController:chatVC];
 	chatVC.friend = roster;
 //	navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
-	chatVC.hidesBottomBarWhenPushed = YES;
-	[self.navigationController pushViewController:chatVC animated:YES];
-//	[self presentViewController:navigationController animated:YES completion:^{
 
-//	 }];
+	[self presentViewController:chatVC animated:YES completion:^{
+
+	 }];
 }
 
 

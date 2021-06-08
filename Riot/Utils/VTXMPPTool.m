@@ -39,8 +39,40 @@
 		[self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 		XMPPJID *jid = [XMPPJID jidWithUser:@"vitta" domain:@"xmpp-hosting.de" resource:@"iOS"];
 		[self.xmppStream setMyJID:jid];
+
+		// 创建重连组件
+		XMPPReconnect *xmppReconnect = [[XMPPReconnect alloc]init];
+		[xmppReconnect activate:[VTXMPPTool shareTool].xmppStream];
+
+
+		XMPPRosterCoreDataStorage *xmppRosterCoreDataStorage = [[XMPPRosterCoreDataStorage alloc] init];
+		XMPPRoster *xmppRoster = [[XMPPRoster alloc] initWithRosterStorage:xmppRosterCoreDataStorage];
+		self.xmppRoster = xmppRoster;
+		[xmppRoster activate:[VTXMPPTool shareTool].xmppStream];
+		// 用户管理上下文
+		NSManagedObjectContext* xmppRosterManagedObjectContext = xmppRosterCoreDataStorage.mainThreadManagedObjectContext;
+		self.xmppRosterManagedObjectContext = xmppRosterManagedObjectContext;
+
+
+		//创建消息保存策略（规则，规定）
+		XMPPMessageArchivingCoreDataStorage* messageStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
+		//用消息保存策略创建消息保存组件
+		XMPPMessageArchiving* xmppMessageArchiving = [[XMPPMessageArchiving alloc]initWithMessageArchivingStorage:messageStorage];
+		//使组件生效
+		[xmppMessageArchiving activate:[VTXMPPTool shareTool].xmppStream];
+		//提取消息保存组件的coreData上下文
+		self.xmppMessageManagedObjectContext = messageStorage.mainThreadManagedObjectContext;
+
+		//连接服务器
+		NSError *error2 = nil;
+		[[VTXMPPTool shareTool].xmppStream connectWithTimeout:10 error:&error2];
+		if (error2) {
+			WLog(@"连接出错：%@",[error2 localizedDescription]);
+			[QMUITips hideAllTips];
+		}
 	}
 }
+
 
 
 #pragma mark - XMPP delegate
