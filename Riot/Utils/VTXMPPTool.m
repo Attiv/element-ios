@@ -36,8 +36,9 @@
 -(void)startXMPP {
 	if (nil == self.xmppStream) {
 		self.xmppStream = [[XMPPStream alloc] init];
+		[self.xmppStream setHostName:@"chat-ext.kelare-demo.com"];
 		[self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
-		XMPPJID *jid = [XMPPJID jidWithUser:@"vitta" domain:@"xmpp-hosting.de" resource:@"iOS"];
+		XMPPJID *jid = [XMPPJID jidWithUser:@"kelaredemo2" domain:@"chat.kelare-demo.com" resource:@"iOS"];
 		[self.xmppStream setMyJID:jid];
 
 		// 创建重连组件
@@ -81,7 +82,7 @@
 {
 	//连接成功后认证用户名和密码
 	NSError *error = nil;
-	[self.xmppStream authenticateWithPassword:@"123123" error:&error];
+	[self.xmppStream authenticateWithPassword:@"P@55word1!" error:&error];
 	if (error) {
 		WLog(@"认证错误：%@",[error localizedDescription]);
 	}
